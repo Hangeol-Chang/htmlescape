@@ -1,4 +1,5 @@
 import './App.css';
+import Hello from './component/Hello'
 
 function App() {
   const name = "한걸"
@@ -15,6 +16,8 @@ function App() {
         Hello, {name}
       </h1>
       <a href={obj.url}>{obj.name}</a>
+
+      <Hello />
     </div>
   );
 }
