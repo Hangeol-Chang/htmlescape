@@ -1,39 +1,33 @@
 import Grid from '@mui/material/Grid';
-import {Typography} from '@mui/material/';
+import {Button, Typography} from '@mui/material/';
+import { Link } from 'react-router-dom';
 
 export default function Footer() {
-    const footers = [
+    const links = [
         {
-        title: 'Company',
-        description: ['Team', 'History', 'Contact us', 'Locations'],
+            name: 'About',
+            link : '/About'
         },
         {
-        title: 'Features',
-        description: ['Cool stuff', 'Random feature', 'Team feature', 'Developer stuff', 'Another one'],
+            name : 'p1',
+            link : '#'
         },
         {
-        title: 'Resources',
-        description: ['Resource', 'Resource name', 'Another resource', 'Final resource'],
-        },
-        {
-        title: 'Legal',
-        description: ['Privacy policy', 'Terms of use'],
-        },
+            name : 'p2',
+            link : '#'
+        }
     ];
 
     return (
-        <footer style={{background: "#53629F"}}>
+        <footer style={{background: "#798BBC"}}>
             <Grid container spacing={0} justify="space-evenly">
-                {footers.map(footer => (
-                    <Grid item xs key={footer.title} sx={{ my : 2}}>
-                        <Typography variant="h6" color="textPrimary" gutterBottom>
-                            {footer.title}
+                {links.map(link => (
+                    <Grid item xs key={link.name} sx={{ my : 2}}>
+                        <Typography color="white" gutterBottom>
+                            <Button variant='text' href={link.link} style={{color : 'white'}}>
+                                {link.name}
+                            </Button>
                         </Typography>
-                        {footer.description.map(item => (
-                        <Typography key={item} variant="subtitle1" color="textSecondary">
-                            {item}
-                        </Typography>
-                    ))}
                     </Grid>
                 ))}
             </Grid>

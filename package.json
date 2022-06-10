@@ -1,7 +1,7 @@
 {
   "name": "htmlescape",
   "version": "0.1.0",
-  "homepage": "https://htmlescape.io",
+  "homepage": "https://hangeol-chang.github.io/htmlescape",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.9.0",
@@ -23,8 +23,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "predepoy" : "npm run build",
-    "deploy" : "gh-pages -d build"
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [

@@ -16,21 +16,6 @@ import FullscreenExit from '@mui/icons-material/FullscreenExit';
     @import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
 </style>
 
-const pages = [
-    {
-        name : 'p1',
-        link : '#',
-    },
-    {
-        name : 'contact',
-        link : '#',
-    },
-    {
-        name : 'github',
-        link : 'https://github.com/Hangeol-Chang/htmlescape',
-    }
-];
-
 const ResponsiveAppBar = () => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
 
@@ -45,7 +30,7 @@ const ResponsiveAppBar = () => {
     <AppBar position="static" style={{ background: '#30406F' }} >
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <FullscreenExit sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+          <FullscreenExit sx={{ display : 'flex', mr: 1 }} />
           <Typography
             variant="h6"
             noWrap
@@ -53,7 +38,7 @@ const ResponsiveAppBar = () => {
             href="/"
             sx={{
               mr: 2,
-              display: { xs: 'none', md: 'flex' },
+              display: 'flex',
               fontFamily: 'Inter',
               fontWeight: 600,
               color: 'inherit',
@@ -61,81 +46,7 @@ const ResponsiveAppBar = () => {
             }}
           >
             HTML Escape
-          </Typography>
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            {pages.map((page) => (
-              <Button
-                key={page.name}
-                href={page.link}
-                sx={{ my: 2, color: 'white', display: 'block' }}
-              >
-                {page.name}
-              </Button>
-            ))}
-          </Box>
-        
-        {/* 사이즈가 작을 때 */}
-          <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-            <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleOpenNavMenu}
-              color="inherit"
-            >
-              <MenuIcon />
-            </IconButton>
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorElNav}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'left',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'left',
-              }}
-              open={Boolean(anchorElNav)}
-              onClose={handleCloseNavMenu}
-              sx={{
-                display: { xs: 'block', md: 'none' },
-              }}
-            >
-              {pages.map((page) => (
-                <MenuItem key={page.name} >
-                    <Typography textAlign="center">
-                      <Link href={page.link} style={{ color:'black', textDecoration:'none'}}>
-                        {page.name}
-                      </Link>
-                    </Typography>
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box>
-
-          <FullscreenExit sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
-          <Typography
-            variant="h5"
-            noWrap
-            component="a"
-            href=""
-            sx={{
-              mr: 2,
-              display: { xs: 'flex', md: 'none' },
-              flexGrow: 1,
-              fontFamily: 'Inter',
-              fontWeight: 600,
-              letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
-            }}
-          >
-            LOGO
-          </Typography>
-          
+          </Typography>          
         </Toolbar>
       </Container>
     </AppBar>
