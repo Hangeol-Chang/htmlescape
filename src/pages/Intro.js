@@ -1,5 +1,6 @@
 import Button from '@mui/material/Button'
 import Box from '@mui/material/Box'
+import { Link } from 'react-router-dom';
 
 export default function Intro() {
 
@@ -12,9 +13,7 @@ export default function Intro() {
             justifyContent : 'center'
         }}>
             <h1>Hello! Welcome to the Html Escape</h1>
-            <Button href='htmlescape/stage1' variant="outlined" color="primary">
-                Start Escape
-            </Button>
+            <Link to="/stage1">Start Escape</Link>
             <hr></hr>
         </Box>
     );

@@ -1,5 +1,5 @@
 import './App.css';
-import {BrowserRouter, Route, Routes} from "react-router-dom";
+import { HashRouter as Router, Route, Routes} from "react-router-dom";
 
 import {Box} from '@mui/material/'
 
@@ -8,12 +8,17 @@ import Footer from './pages/common/Footer';
 
 import Intro from './pages/Intro';
 import Stage1 from './pages/Stage1';
+import Stage2 from './pages/Stage2';
+import Clear from './pages/clear';
 
 console.log(process.env.PUBLIC_URL)
 
 function App() {
   return (
     <div className="App">
+      <div>
+        Hello
+      </div>
       <Header />
       <Box sx={{
         minHeight:'600px',
@@ -21,18 +26,15 @@ function App() {
         alignItems : 'center',
         justifyContent : 'center',
       }}>
-        <BrowserRouter>
+        <Router>
           <Routes>
             <Route exact path="/" element={<Intro />} />
-          </Routes> 
-        </BrowserRouter> 
+            <Route exact path="/stage1" element={<Stage1 />} />
+            <Route exact path="/stage2" element={<Stage2 />} />
 
-        <BrowserRouter basename={process.env.PUBLIC_URL}>
-          <Routes>
-            <Route exact path="/" element={<Intro />} />
-            <Route path="/stage1" element={<Stage1 />} />
-          </Routes>
-        </BrowserRouter>
+            <Route exact path="/clear" element={<Clear />} />
+          </Routes>   
+        </Router> 
       </Box>
       
       <Footer />
