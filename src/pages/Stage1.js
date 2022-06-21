@@ -1,5 +1,4 @@
 import {Box, Button, Grid, Typography} from '@mui/material/'
-import { render } from '@testing-library/react';
 import { useState, setState, Component } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -21,16 +20,16 @@ export default function Stage1() {
     }
 
     const Setval = (val, e) => {
-        console.log(key + " 누른 값 " + val);
+        // console.log(key + " 누른 값 " + val);
         
         if(key.length == 7) {
             if(key === "1685723" && val == 4){
-                console.log("pass");
+                // console.log("pass");
                 
                 navigate('/stage2');
             }
             else {
-                console.log("fail");
+                // console.log("fail");
                 setans('incorrect answer. try again!!');
                 setkey('');
 

@@ -58,7 +58,7 @@ export default function Footer() {
             </Grid>
             
             {devinfo.map(info => (
-                <Typography variant='body2'>
+                <Typography variant='body2' key={info.title}>
                     <span style={{fontWeight:700,}}>
                         {info.title}
                     </span>

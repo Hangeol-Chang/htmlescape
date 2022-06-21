@@ -1,7 +1,6 @@
 import Button from '@mui/material/Button'
 import Box from '@mui/material/Box'
 import { Link } from 'react-router-dom';
-import { blue } from '@mui/material/colors';
 import { Typography } from '@mui/material';
 
 export default function Intro() {

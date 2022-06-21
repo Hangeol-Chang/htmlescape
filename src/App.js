@@ -10,6 +10,8 @@ import Intro from './pages/Intro';
 import Stage1 from './pages/Stage1';
 import Stage2 from './pages/Stage2';
 import Clear from './pages/clear';
+import Stage3 from './pages/Stage3';
+import Stage4 from './pages/Stage4';
 
 console.log(process.env.PUBLIC_URL)
 
@@ -28,6 +30,8 @@ function App() {
             <Route exact path="/" element={<Intro />} />
             <Route exact path="/stage1" element={<Stage1 />} />
             <Route exact path="/stage2" element={<Stage2 />} />
+            <Route exact path="/stage3" element={<Stage3 />} />
+            <Route exact path="/stage4" element={<Stage4 />} />
 
             <Route exact path="/clear" element={<Clear />} />
           </Routes>   
