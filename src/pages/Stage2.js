@@ -58,7 +58,9 @@ export default function Stage2() {
                     you just need to click button 39<br />
                     ...<br />
                     what? there isn`t button 39? <br/>
-                    coneon~ don`t border me.<br />
+                    come on~ don`t border me.
+                </Typography>
+                <Typography variant="h6">
                     you can 'make' it yourself, aren`t you?
                 </Typography>
             </Box>
