@@ -1,4 +1,4 @@
-import {Box, Button, Typography} from '@mui/material/'
+import {Box, Button, Grid, Typography} from '@mui/material/'
 import { render } from '@testing-library/react';
 import { useState, setState, Component } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +8,17 @@ let botbt = [5, 6, 7, 8];
 
 export default function Stage1() {
     let [key, setkey] = useState('');
+    let [ans, setans] = useState('');
     const navigate = useNavigate();
+
+    const fail = () => {
+        setans = 'incorrect answer. try again!!';
+
+        setTimeout(() => {
+            setans=''
+        }, 2000)
+
+    }
 
     const Setval = (val, e) => {
         console.log(key + " 누른 값 " + val);
@@ -21,7 +31,12 @@ export default function Stage1() {
             }
             else {
                 console.log("fail");
+                setans('incorrect answer. try again!!');
                 setkey('');
+
+                setTimeout(() => {
+                    setans('');
+                }, 3000)
             }
         }
         else setkey(key.concat(val));
@@ -39,6 +54,24 @@ export default function Stage1() {
                     {n}
                 </Button>
             ))}
+            
+                {
+                    ans === ''
+                    ? (
+                        <Grid container justifyContent='center' alignItems='center'>
+                            <span>your input : </span>
+                            <Typography variant='h6'>
+                                {key}                       
+                            </Typography>    
+                        </Grid>
+                    )
+                    : (
+                    <Typography variant='h5' color='red'>
+                        {ans}
+                    </Typography>
+                    )
+                }
+
             <h2>Hello! umm... it seems there are some buttons you can click.</h2>
             <Typography>
                 find the correct order to escape this page.<br></br>
@@ -52,7 +85,7 @@ export default function Stage1() {
                 developer tools?
             </Typography>
             <Typography sx={{ fontSize : '6px' }}>
-                oops! why line break is occur between ... and developer ?
+                oops! why line break is occur between '...' and 'developer' ?
             </Typography>
             
             {botbt.map( n => (

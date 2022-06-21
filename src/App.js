@@ -16,9 +16,6 @@ console.log(process.env.PUBLIC_URL)
 function App() {
   return (
     <div className="App">
-      <div>
-        Hello
-      </div>
       <Header />
       <Box sx={{
         minHeight:'600px',

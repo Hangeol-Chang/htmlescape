@@ -35,14 +35,41 @@ export default function Footer() {
         <footer style={{
                 background: "#798BBC",
                 color : 'white',
-                padding : '10px',
+                padding : '20px',
             }}>
-            <Grid container spacing={0} justify="space-evenly">
-                <GitHub></GitHub>
-                <YouTube></YouTube>
-                <Article></Article>
+            <Grid container spacing={3} justifyContent="center"
+               sx={{ mb : 2, }}
+            >
+                <Grid item>
+                    <a href="https://github.com/Hangeol-Chang"  style={{ color : 'white' }}>
+                        <GitHub></GitHub>
+                    </a>
+                </Grid>
+                <Grid item>
+                    <a href="https://www.youtube.com/channel/UCFHxE7grCP07kWQqkZYuf9A"  style={{ color : 'white' }}>
+                        <YouTube></YouTube>
+                    </a>
+                </Grid>
+                <Grid item>
+                    <a href="https://hangeol-chang.github.io"  style={{ color : 'white' }}>
+                        <Article></Article>
+                    </a> 
+                </Grid>
             </Grid>
-            <Grid container spacing={0} justify="space-evenly">
+            
+            {devinfo.map(info => (
+                <Typography variant='body2'>
+                    <span style={{fontWeight:700,}}>
+                        {info.title}
+                    </span>
+                    <span> : </span>
+                    <span>
+                        {info.value}
+                    </span>
+                </Typography>
+            ))}
+
+            {/* <Grid container spacing={0} justify="space-evenly">
                 {links.map(link => (
                     <Grid item xs key={link.name} sx={{ my : 2}}>
                         <Typography color="white" gutterBottom>
@@ -52,11 +79,11 @@ export default function Footer() {
                         </Typography>
                     </Grid>
                 ))}
-            </Grid>
+            </Grid> */}
 
-            <div>
+            <Typography variant='subtitle2' sx={{mt : 2}}>
                 {copyright}
-            </div>
+            </Typography>
         </footer>
     )
 }
