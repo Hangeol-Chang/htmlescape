@@ -8,6 +8,7 @@
     "@emotion/styled": "^11.8.1",
     "@mui/icons-material": "^5.8.3",
     "@mui/material": "^5.8.3",
+    "@react-google-maps/api": "^2.17.1",
     "@react-three/drei": "^9.17.1",
     "@react-three/fiber": "^8.2.0",
     "@testing-library/jest-dom": "^5.16.4",

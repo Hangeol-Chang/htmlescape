@@ -12,6 +12,7 @@ import Stage2 from './pages/Stage2';
 import Clear from './pages/clear';
 import Stage3 from './pages/Stage3';
 import Stage4 from './pages/Stage4';
+import Googlepoly from './pages/Googlepoly';
 
 console.log(process.env.PUBLIC_URL)
 
@@ -34,6 +35,8 @@ function App() {
             <Route exact path="/stage4" element={<Stage4 />} />
 
             <Route exact path="/clear" element={<Clear />} />
+
+            <Route exact path="/googlepoly" element={<Googlepoly />} />
           </Routes>   
         </Router> 
       </Box>
