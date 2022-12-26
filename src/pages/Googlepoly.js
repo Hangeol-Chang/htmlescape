@@ -5,28 +5,6 @@ import { GoogleMap, LoadScript, useJsApiLoader } from '@react-google-maps/api'
 export default function Googlepoly() {
     let [coordi, setCoordi] = React.useState([]);
 
-
-    function MapComp() {
-        const { isLoaded, loadError } = useJsApiLoader({
-            googleMapsApiKey: "AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg"
-        })
-
-        const renderMap = () => {
-            // const onLoad = React.useCallback(
-            //     function onLoad (mapInstance) {
-                    
-            //     }
-            // )
-            return <GoogleMap>
-
-            </GoogleMap>
-        }
-        if(loadError) {
-            return <div>Map cannot be loaded</div>
-        }
-        return isLoaded ? renderMap() : <></>
-    }
-
     const containerStyle = {
         width: '400px',
         height: '400px'
