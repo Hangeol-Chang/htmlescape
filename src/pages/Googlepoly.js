@@ -40,7 +40,7 @@ export default function Googlepoly() {
         zIndex: 1
     })
 
-    let [center, setSenter] = React.useState({
+    let [center, setSenter] = useState({
         lat: 37.497952,
         lng: 127.027619
     });
@@ -88,28 +88,33 @@ export default function Googlepoly() {
 
     return(
         <Box>
-            <textarea
-                id="inputcoordi"
-                rows="10"
-                cols="100"
-                value={coordi}
-                onChange={(e) => setCoordi(e.target.value)}
+            <Box
+                sx={{display : 'flex'}}
             >
-            </textarea>
-            <Button 
-                sx={{m : 2}}
-                variant="outlined" 
-                onClick={() => makeline()}
-            >
-                이거슨 버튼
-            </Button>
-            
-            원 크기 조정
-            <Slider></Slider>
-            선 색상 입력
-            <Input></Input>
-            원 색상 입력
-            <Input></Input>
+                <textarea
+                    id="inputcoordi"
+                    rows="10"
+                    cols="100"
+                    value={coordi}
+                    onChange={(e) => setCoordi(e.target.value)}
+                >
+                </textarea>
+                <Button 
+                    sx={{m : 2}}
+                    variant="outlined" 
+                    onClick={() => makeline()}
+                >
+                    이거슨 버튼
+                </Button>
+                
+                원 크기 조정
+                <Slider></Slider>
+                선 색상 입력
+                <Input></Input>
+                원 색상 입력
+                <Input></Input>
+            </Box>
+
             <LoadScript
                 googleMapsApiKey="AIzaSyBkZS2y5XLGTz09p372w0MV4bQgeukEiiQ"
             >
