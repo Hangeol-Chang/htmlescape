@@ -1,5 +1,5 @@
-import { Box, Button, Input, Slider } from "@mui/material";
-import { useState } from "react";
+import { Box, Button, Input, Slider, TextField, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
 import { Circle, GoogleMap, LoadScript, Polyline, useJsApiLoader } from '@react-google-maps/api'
 
 export default function Googlepoly() {
@@ -45,41 +45,68 @@ export default function Googlepoly() {
         lng: 127.027619
     });
 
-    const containerStyle = {
-        width: window.innerWidth * 0.8,
-        height: window.innerHeight * 0.6
-    };
+    let [containerStyle, setContainerStyle] = useState({
+        width: window.innerWidth,
+        height: window.innerHeight * 0.8
+    });
+
+    function handleResize() {
+        setContainerStyle({
+            width: window.innerWidth,
+            height: window.innerHeight * 0.8
+        })
+    }
+
+    useEffect(() => {
+        window.addEventListener('resize', handleResize);
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        }
+    })
+
+    function changeCircleSize(size) {
+        setcircleOptions({
+            strokeOpacity : 0,
+            fillColor: '#FF0000',
+            fillOpacity: 0.35,
+            clickable: false,
+            draggable: false,
+            editable: false,
+            visible: true,
+            radius: size,
+            zIndex: 1
+        })
+    }
 
     function makeline() {
-        let aa = coordi
+        let coordiString = coordi
             .replaceAll("[", "")
             .replaceAll("]", "")
             .replaceAll("\n", "")
             .replaceAll(" ", "")
 
-        const bb = aa.split(",").map(Number)
-        const len = bb.length
+        const coordiArr = coordiString.split(",").map(Number)
+        const len = coordiArr.length
 
-        let arr = []
-        let circlecoordi = []
+        let tmpPath = []
         let totlat = 0;
         let totlng = 0;
         for (let i = 0; i < len; i += 2) {
-            console.log(bb[i] + " " + bb[i+1])
+            console.log(coordiArr[i] + " " + coordiArr[i+1])
             
-            arr.push({
-                "lat" : bb[i],
-                "lng" : bb[i+1]
+            tmpPath.push({
+                "lat" : coordiArr[i],
+                "lng" : coordiArr[i+1]
             })
 
-            totlat += bb[i];
-            totlng += bb[i+1];
+            totlat += coordiArr[i];
+            totlng += coordiArr[i+1];
         }
         totlat = totlat / (len/2)
         totlng = totlng / (len/2)
 
-        console.log(arr)
-        setPath(arr)
+        // console.log(path)
+        setPath(tmpPath)
         setSenter({
             "lat": totlat,
             "lng": totlng
@@ -89,30 +116,67 @@ export default function Googlepoly() {
     return(
         <Box>
             <Box
-                sx={{display : 'flex'}}
+                sx={{
+                    display : 'flex',
+                    m:2,
+                    justifyContent: 'center'
+                }}
             >
-                <textarea
-                    id="inputcoordi"
-                    rows="10"
-                    cols="100"
-                    value={coordi}
-                    onChange={(e) => setCoordi(e.target.value)}
+                <Box
+                    sx={{
+                        display : 'flex',
+                        flexDirection: 'column',
+                        mx : 2
+                    }}
                 >
-                </textarea>
-                <Button 
-                    sx={{m : 2}}
-                    variant="outlined" 
-                    onClick={() => makeline()}
-                >
-                    이거슨 버튼
-                </Button>
+                    <TextField
+                        variant="outlined"
+                        id="inputcoordi"
+                        value={coordi}
+                        multiline
+                        maxRows={5}
+                        sx={{width:300, height:150}}
+                        onChange={(e) => setCoordi(e.target.value)}
+                    >
+                    </TextField>
+
+                    <Button 
+                        sx={{m : 0, width:300, height:40}}
+                        variant="outlined" 
+                        onClick={() => makeline()}
+                    >
+                        Draw Path
+                    </Button>
+                </Box>
                 
-                원 크기 조정
-                <Slider></Slider>
-                선 색상 입력
-                <Input></Input>
-                원 색상 입력
-                <Input></Input>
+                <Box
+                    sx={{
+                        backgroundColor: 'white',
+                        width : 400,
+                        px:2
+                    }}
+                >
+                    <Box
+                        sx={{
+                            display : 'flex',
+                            alignItems:'center'
+                        }}
+                    >
+                        <Typography sx={{width:100, mr:2}}>
+                            Circle Size
+                        </Typography>
+                        <Slider
+                            aria-label="Always visible"
+                            defaultValue={0.1}
+                            step={0.01}
+                            min={0}
+                            max={2}
+                            valueLabelDisplay="auto"
+                            onChange={(e) => changeCircleSize(e.target.value)}
+                        />
+                    </Box>
+                    
+                </Box>
             </Box>
 
             <LoadScript
