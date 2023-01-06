@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Circle, GoogleMap, LoadScript, Polyline, useJsApiLoader } from '@react-google-maps/api'
 import {red, blue, green} from "@mui/material/colors"
 import ColorSlider from "../components/googlepoly/ColorSlider";
+import PolyArrow from "../components/googlepoly/PolyArrow";
 
 export default function Googlepoly() {
     let [coordi, setCoordi] = useState("[[37.772, -122.214],[21.291, -157.821],[18.142, 178.431],[27.467, 153.027]]");
@@ -13,6 +14,7 @@ export default function Googlepoly() {
         {lat: -27.467, lng: 153.027}
     ]);
     let [zoom, setZoom] = useState(10);
+    let [lngfirst, setLngfirst] = useState(false);
 
     let [circleColor_r, setCircleColor_r] = useState(255);
     let [circleColor_g, setCircleColor_g] = useState(0);
@@ -96,13 +98,6 @@ export default function Googlepoly() {
         })
     }
 
-    function changeCircleSize(size) {
-        setcircleOptions({
-            ...circleOptions,
-            radius: size,
-        })
-    }
-
     function makeline() {
         let coordiString = coordi
             .replaceAll("[", "")
@@ -116,16 +111,21 @@ export default function Googlepoly() {
         let tmpPath = []
         let totlat = 0;
         let totlng = 0;
+
+        let latidf = 0;
+        let lngidf = 1;
+        if(lngfirst) { latidf = 1; lngidf = 0; }
+
         for (let i = 0; i < len; i += 2) {
             console.log(coordiArr[i] + " " + coordiArr[i+1])
             
             tmpPath.push({
-                "lat" : coordiArr[i],
-                "lng" : coordiArr[i+1]
+                "lat" : coordiArr[i + latidf],
+                "lng" : coordiArr[i + lngidf]
             })
 
-            totlat += coordiArr[i];
-            totlng += coordiArr[i+1];
+            totlat += coordiArr[i + latidf];
+            totlng += coordiArr[i + lngidf];
         }
         totlat = totlat / (len/2)
         totlng = totlng / (len/2)
@@ -147,8 +147,7 @@ export default function Googlepoly() {
             <Box
                 sx={{
                     display : 'flex',
-                    m:2,
-                    p:2,
+                    m:2, p:2,
                     justifyContent: 'center',
                     maxWidth:800,
                     borderRadius:2,
@@ -171,39 +170,34 @@ export default function Googlepoly() {
                         onChange={(e) => setCoordi(e.target.value)}
                     >
                     </TextField>
-
-                    <Button 
-                        sx={{m : 0, width:300, height:40}}
-                        variant="outlined" 
-                        onClick={() => makeline()}
-                    >
-                        Draw Path
-                    </Button>
+                    
+                    <Box sx={{display:'flex'}}>
+                        <FormControlLabel control={<Checkbox checked={lngfirst} onChange={(e) => setLngfirst(e.target.checked)}/>} label="lng_first" />
+                        <Button 
+                            sx={{m : 0, width: '100%', height:40}}
+                            variant="outlined" 
+                            onClick={() => makeline()}
+                        >
+                            Draw Path
+                        </Button>
+                    </Box>
                 </Box>
 
                 <Box
                     sx={{
-                        width : 400,
-                        px:2,
+                        width : 400, px:2,
 
                         display:'flex',
                         flexDirection: 'column'
                     }}
                 >
-                    <Box
-                        sx={{
-                            display : 'flex',
-                            alignItems:'center'
-                        }}
-                    >
+                    <Box sx={{ display : 'flex', alignItems:'center'}} >
                         <Typography sx={{width:120, mr:2}}>
                             Circle Size
                         </Typography>
                         <Slider
                             defaultValue={1}
-                            step={0.002}
-                            min={0}
-                            max={1}
+                            step={0.002} min={0} max={2}
                             valueLabelDisplay="auto"
                             onChange={(e) => {
                                 setcircleOptions((prevState) => {
@@ -285,11 +279,16 @@ export default function Googlepoly() {
                         viewLine ? <Polyline path={path} options={lineOptions} />
                         : <></>
                     }
+                    
+                    {
+                        viewArrow ? <PolyArrow path={path} lineOptions={lineOptions} />
+                        : <></>
+                    }
 
                     {
                         viewMarker ? 
-                            path.map(c => (
-                                <Circle center={c} key={c[0]} options={circleOptions} />
+                            path.map((c, idx) => (
+                                <Circle center={c} key={idx} options={circleOptions} />
                             ))
                         : <></>
                     }
