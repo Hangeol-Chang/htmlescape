@@ -1,7 +1,8 @@
-import { Box, Button, Checkbox, Divider, FormControlLabel, FormGroup, Input, Slider, TextField, Typography } from "@mui/material";
+import { Box, Button, Checkbox, Divider, FormControlLabel, FormGroup, Input, Slider, stepConnectorClasses, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Circle, GoogleMap, LoadScript, Polyline, useJsApiLoader } from '@react-google-maps/api'
 import {red, blue, green} from "@mui/material/colors"
+import ColorSlider from "../components/googlepoly/ColorSlider";
 
 export default function Googlepoly() {
     let [coordi, setCoordi] = useState("[[37.772, -122.214],[21.291, -157.821],[18.142, 178.431],[27.467, 153.027]]");
@@ -65,7 +66,11 @@ export default function Googlepoly() {
         }
     })
 
-    function setCircleColor() {
+    const setCircleColor = function(val, idf) {
+        if(idf == "red")        setCircleColor_r(val);
+        else if(idf == "green") setCircleColor_g(val);
+        else                    setCircleColor_b(val);
+
         const tmpColor = "#" + 
             ("0" + circleColor_r.toString(16)).substr(-2) +  
             ("0" + circleColor_g.toString(16)).substr(-2) +  
@@ -76,11 +81,15 @@ export default function Googlepoly() {
         })
     }
 
-    function setLineColor() {
+    const setLineColor = function(val, idf) {
+        if(idf == "red")        setLineColor_r(val);
+        else if(idf == "blue")  setLineColor_b(val);
+        else                    setLineColor_g(val);
+
         const tmpColor = "#" + 
-            ("0" + lineColor_r.toString(16)).substr(-2) +  
-            ("0" + lineColor_g.toString(16)).substr(-2) +  
-            ("0" + lineColor_b.toString(16)).substr(-2);
+        ("0" + lineColor_r.toString(16)).substr(-2) +  
+        ("0" + lineColor_g.toString(16)).substr(-2) +  
+        ("0" + lineColor_b.toString(16)).substr(-2);
 
         setLineOptions((prev) => {
             return {...prev, strokeColor: tmpColor}
@@ -157,8 +166,7 @@ export default function Googlepoly() {
                         variant="outlined"
                         id="inputcoordi"
                         value={coordi}
-                        multiline
-                        rows={6}
+                        multiline rows={6} label="Input Coordinates"
                         sx={{width:300, height:180}}
                         onChange={(e) => setCoordi(e.target.value)}
                     >
@@ -172,10 +180,9 @@ export default function Googlepoly() {
                         Draw Path
                     </Button>
                 </Box>
-                
+
                 <Box
                     sx={{
-                        backgroundColor: 'white',
                         width : 400,
                         px:2,
 
@@ -223,30 +230,9 @@ export default function Googlepoly() {
                                 width:'100%',
                             }}
                         >
-                            <Slider
-                                sx={{ color: red[500]}} value={circleColor_r} 
-                                defaultValue={255} min={0} max={255} step={1}
-                                onChange={(e) => {
-                                    setCircleColor_r(e.target.value)
-                                    setCircleColor()
-                                }}
-                            />
-                            <Slider
-                                sx={{ color: green[500], mx:2 }} value={circleColor_g} 
-                                defaultValue={0} min={0} max={255}
-                                onChange={(e) => {
-                                    setCircleColor_g(e.target.value)
-                                    setCircleColor()
-                                }}
-                            />
-                            <Slider
-                                sx={{ color: blue[500] }} value={circleColor_b} 
-                                defaultValue={0} min={0} max={255}
-                                onChange={(e) => {
-                                    setCircleColor_b(e.target.value)
-                                    setCircleColor()
-                                }}
-                            />
+                            <ColorSlider color={ red[500] } idf="red"   check={circleColor_r} setColor={setCircleColor} />
+                            <ColorSlider color={green[500]} idf="green" check={circleColor_g} setColor={setCircleColor} />
+                            <ColorSlider color={ blue[500]} idf="blue"  check={circleColor_b} setColor={setCircleColor} />
                         </Box>
                     </Box>
                     <Divider sx={{my:2}}/>
@@ -265,32 +251,10 @@ export default function Googlepoly() {
                                 width:'100%',
                             }}
                         >
-                            <Slider
-                                sx={{ color: red[500] }} value={lineColor_r} 
-                                defaultValue={255} min={0} max={255} step={1}
-                                onChange={(e) => {
-                                    setLineColor_r(e.target.value)
-                                    setLineColor()
-                                }}
-                            />
-                            <Slider
-                                sx={{ color: green[500], mx:2 }} value={lineColor_g} 
-                                defaultValue={0} min={0} max={255}
-                                onChange={(e) => {
-                                    setLineColor_g(e.target.value)
-                                    setLineColor()
-                                }}
-                            />
-                            <Slider
-                                sx={{ color: blue[500] }} value={lineColor_b} 
-                                defaultValue={0} min={0} max={255}
-                                onChange={(e) => {
-                                    setLineColor_b(e.target.value)
-                                    setLineColor()
-                                }}
-                            />
+                            <ColorSlider color={ red[500] } idf="red"   check={lineColor_r} setColor={setLineColor} />
+                            <ColorSlider color={green[500]} idf="green" check={lineColor_g} setColor={setLineColor} />
+                            <ColorSlider color={ blue[500]} idf="blue"  check={lineColor_b} setColor={setLineColor} />
                         </Box>
-
                     </Box>
 
                     <Divider sx={{my:2}}/>
@@ -302,13 +266,10 @@ export default function Googlepoly() {
                             }}
                             
                             >
-
                             <FormControlLabel control={<Checkbox checked={viewLine} onChange={(e) => setViewLine(e.target.checked)}/>} label="Line" />
                             <FormControlLabel control={<Checkbox checked={viewMarker}  onChange={(e) => setViewMarker(e.target.checked)}/>} label="Marker" />
                             <FormControlLabel control={<Checkbox checked={viewArrow} disabled  onChange={(e) => setViewArrow(e.target.checked)}/>} label="Arrow" />
                         </Box>
-
-                    
                 </Box>
             </Box>
 
