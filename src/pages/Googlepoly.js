@@ -14,6 +14,7 @@ export default function Googlepoly() {
         {lat: -27.467, lng: 153.027}
     ]);
     let [zoom, setZoom] = useState(10);
+    let [hhmmddd, setHhmmddd] = useState(false);
     let [lngfirst, setLngfirst] = useState(false);
 
     let [circleColor_r, setCircleColor_r] = useState(255);
@@ -99,15 +100,16 @@ export default function Googlepoly() {
     }
 
     function makeline() {
+        console.log(coordi)
         let coordiString = coordi
             .replaceAll("[", "")
             .replaceAll("]", "")
-            .replaceAll("\n", "")
             .replaceAll(" ", "")
+            .replaceAll("\t", ",")
+            .replaceAll("\n", ",")
 
-        const coordiArr = coordiString.split(",").map(Number)
-        const len = coordiArr.length
-
+        const coordiArr = coordiString.split(",").map(Number); 
+        const len = parseInt(coordiArr.length)*2;
         let tmpPath = []
         let totlat = 0;
         let totlng = 0;
@@ -115,22 +117,33 @@ export default function Googlepoly() {
         let latidf = 0;
         let lngidf = 1;
         if(lngfirst) { latidf = 1; lngidf = 0; }
-
+        
+        let coordicount = 0
         for (let i = 0; i < len; i += 2) {
-            console.log(coordiArr[i] + " " + coordiArr[i+1])
+            let tmplat = coordiArr[i + latidf];
+            let tmplng = coordiArr[i + lngidf];
+
+            console.log(tmplat + " " + tmplng)
+            if(hhmmddd) {
+                tmplat = parseInt(tmplat / 100) + tmplat % 100 / 60
+                tmplng = parseInt(tmplng / 100) + tmplng % 100 / 60
+            }
+
+            if((Math.abs(tmplat) < 1 && Math.abs(tmplng) < 1)) continue;
+            if(!tmplat || !tmplng) break;
             
             tmpPath.push({
-                "lat" : coordiArr[i + latidf],
-                "lng" : coordiArr[i + lngidf]
+                "lat" : tmplat,
+                "lng" : tmplng
             })
 
-            totlat += coordiArr[i + latidf];
-            totlng += coordiArr[i + lngidf];
+            totlat += tmplat;
+            totlng += tmplng;
+            coordicount++; 
         }
-        totlat = totlat / (len/2)
-        totlng = totlng / (len/2)
+        totlat = totlat / coordicount;
+        totlng = totlng / coordicount;
 
-        // console.log(path)
         setPath(tmpPath)
         setSenter({
             "lat": totlat,
@@ -149,7 +162,7 @@ export default function Googlepoly() {
                     display : 'flex',
                     m:2, p:2,
                     justifyContent: 'center',
-                    maxWidth:800,
+                    maxWidth:1000,
                     borderRadius:2,
                     boxShadow:1
                 }}
@@ -166,13 +179,15 @@ export default function Googlepoly() {
                         id="inputcoordi"
                         value={coordi}
                         multiline rows={6} label="Input Coordinates"
-                        sx={{width:300, height:180}}
+                        sx={{width:400, height:180}}
                         onChange={(e) => setCoordi(e.target.value)}
                     >
                     </TextField>
                     
-                    <Box sx={{display:'flex'}}>
+                    <Box sx={{display:'flex', alignItems:'center'}}>
+                        <FormControlLabel control={<Checkbox checked={hhmmddd} onChange={(e) => setHhmmddd(e.target.checked)}/>} label="hhmm˚ddd" />
                         <FormControlLabel control={<Checkbox checked={lngfirst} onChange={(e) => setLngfirst(e.target.checked)}/>} label="lng_first" />
+
                         <Button 
                             sx={{m : 0, width: '100%', height:40}}
                             variant="outlined" 
@@ -258,7 +273,7 @@ export default function Googlepoly() {
                                 display: 'flex',
                                 justifyContent: 'space-between'
                             }}
-                            
+
                             >
                             <FormControlLabel control={<Checkbox checked={viewLine} onChange={(e) => setViewLine(e.target.checked)}/>} label="Line" />
                             <FormControlLabel control={<Checkbox checked={viewMarker}  onChange={(e) => setViewMarker(e.target.checked)}/>} label="Marker" />
@@ -280,10 +295,10 @@ export default function Googlepoly() {
                         : <></>
                     }
                     
-                    {
+                    {/* {
                         viewArrow ? <PolyArrow path={path} lineOptions={lineOptions} />
                         : <></>
-                    }
+                    } */}
 
                     {
                         viewMarker ? 
