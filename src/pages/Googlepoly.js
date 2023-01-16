@@ -123,13 +123,15 @@ export default function Googlepoly() {
             let tmplat = coordiArr[i + latidf];
             let tmplng = coordiArr[i + lngidf];
 
-            console.log(tmplat + " " + tmplng)
             if(hhmmddd) {
-                tmplat = parseInt(tmplat / 100) + tmplat % 100 / 60
-                tmplng = parseInt(tmplng / 100) + tmplng % 100 / 60
+                tmplat = parseInt(tmplat / 100) + tmplat % 100 / 60;
+                tmplng = parseInt(tmplng / 100) + tmplng % 100 / 60;
+                // tmplat = parseInt(tmplat / 100) + parseInt(tmplat % 100) / 60 + (tmplat % 1)*100 / 3600;
+                // tmplng = parseInt(tmplng / 100) + parseInt(tmplng % 100) / 60 + (tmplng % 1)*100 / 3600;
             }
+            console.log(tmplat + " " + tmplng)
 
-            if((Math.abs(tmplat) < 1 && Math.abs(tmplng) < 1)) continue;
+            if((Math.abs(tmplat) < 1 || Math.abs(tmplng) < 1)) continue;
             if(!tmplat || !tmplng) break;
             
             tmpPath.push({
