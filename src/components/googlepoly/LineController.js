@@ -8,20 +8,16 @@ export default function LineController(props) {
     let [lineColor, setLineColor] = useState([0, 0, 255]);
     let [coordi, setCoordi] = useState('[[37.772, -122.214],[21.291, -157.821],[18.142, 178.431],[27.467, 153.027]]');
 
-    function makeLine() {
-
-    }
+    function makeLine() { }
     function delLine() { props.delLine(props.idx) }
 
-    function setHhmmddd() {
-        
-    }
+    function setHhmmddd(val) { props.option.configCompOptions(props.idx, 'hhmmddd', val) }
     function setLngfirst() {
 
     }
     function setCircleRadius(val) {
         // 부모 함수 호출
-        // props.options.setCircleRadius(val. props.idx)
+        props.option.configCompOptions(props.idx, 'radius', val)
     }
     function setViewLine(val) {
 
@@ -109,14 +105,14 @@ export default function LineController(props) {
                 }}
             >
                 <Box sx={{ display : 'flex', alignItems:'center'}} >
-                        <Typography sx={{width:80}} variant="body2" >C Size</Typography>
-                        <Slider
-                            sx={{mx : 1}}
-                            defaultValue={1}
-                            step={0.002} min={0} max={2}
-                            valueLabelDisplay="auto"
-                            onChange={(e) => setCircleRadius(e.target.value)}
-                        />
+                    <Typography sx={{width:80}} variant="body2" >C Size</Typography>
+                    <Slider
+                        sx={{mx : 1}}
+                        defaultValue={1}
+                        step={0.002} min={0} max={2}
+                        valueLabelDisplay="auto"
+                        onChange={(e) => setCircleRadius(e.target.value)}
+                    />
                 </Box>
                 <Divider/>
      
@@ -135,15 +131,10 @@ export default function LineController(props) {
                         alignItems: 'center',
                     }}
                 >
-                    <Typography sx={{width:120, mr:2}}>
+                    <Typography sx={{width:80}} variant='body2'>
                         L Color
                     </Typography>
-                    <Box
-                        sx={{
-                            display:'flex',
-                            width:'100%',
-                        }}
-                    >
+                    <Box sx={{ display:'flex', width:'100%',}}>
                         <ColorSlider color={ red[500] } idf="red"   check={lineColor[0]} setColor={changeLineColor} />
                         <ColorSlider color={green[500]} idf="green" check={lineColor[1]} setColor={changeLineColor} />
                         <ColorSlider color={ blue[500]} idf="blue"  check={lineColor[2]} setColor={changeLineColor} />
@@ -152,13 +143,8 @@ export default function LineController(props) {
 
                 <Divider/>
                 
-                <Box
-                    sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between'
-                    }}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between'}}>
 
-                    >
                     <FormControlLabel control={<Checkbox checked={props.option.viewLine} onChange={(e) => setViewLine(e.target.checked)}/>} label="Line" />
                     <FormControlLabel control={<Checkbox checked={props.option.viewMarker}  onChange={(e) => setViewMarker(e.target.checked)}/>} label="Marker" />
                     <FormControlLabel control={<Checkbox checked={props.option.viewArrow} disabled  onChange={(e) => setViewArrow(e.target.checked)}/>} label="Arrow" />

@@ -7,41 +7,54 @@ import PolyArrow from "../components/googlepoly/PolyArrow";
 import LineController from "../components/googlepoly/LineController";
 
 export default function Googlepoly() {
-    let [options, setOptions] = useState([
-        {
-            path : [],
-            hhmmdd : false,
-            viewLine : true,
-            viewMarker : true,
-            viewArrow : false,
-            hhmmddd : false,
-            lngfirst : false,
-            lineOption : {
-                strokeOpacity: 0.8, strokeWeight: 2,
-                clickable: false, draggable: false,
-                editable: false, visible: true,
-                radius: 30000, zIndex: 1,
-                strokeColor: "#0000FF"
-            },
-            circleOption : {
-                strokeOpacity : 0, fillOpacity: 0.4,
-                clickable: false, draggable: false,
-                editable: false, visible: true,
-                radius: 1, zIndex: 1,
-                fillColor: "#FF0000"
-            }
+    // line이 초기화될 때 가지고 있을 값.
+    const iniOption = {
+        path : [],
+        hhmmdd : false,
+        viewLine : true,
+        viewMarker : true,
+        viewArrow : false,
+        hhmmddd : false,
+        lngfirst : false,
+        lineOption : {
+            strokeOpacity: 0.8, strokeWeight: 2,
+            clickable: false, draggable: false,
+            editable: false, visible: true,
+            radius: 30000, zIndex: 1,
+            strokeColor: "#0000FF"
         },
-    ])
-
-    function addOptions() {
-        setOptions([...options, {}])
+        circleOption : {
+            strokeOpacity : 0, fillOpacity: 0.4,
+            clickable: false, draggable: false,
+            editable: false, visible: true,
+            radius: 1, zIndex: 1,
+            fillColor: "#FF0000"
+        }
     }
+
+    let [options, setOptions] = useState([ iniOption ])
+
+    function addOptions() { setOptions([...options, iniOption]); console.log(options) }
     
     function delOption(idx) {
         let tmpoptions = options
         tmpoptions.splice(idx, 1)
         setOptions([...tmpoptions]);
         console.log(...tmpoptions)
+    }
+    
+    function configCompOptions(idx, idf, val) {
+        switch(idf) {
+            case "aa":
+
+                break;
+            case "radius":
+
+                break;
+            default :
+                console.log("no matched idf for : " + idf);
+        }
+
     }
 
     let [coordi, setCoordi] = useState("[[37.772, -122.214],[21.291, -157.821],[18.142, 178.431],[27.467, 153.027]]");
