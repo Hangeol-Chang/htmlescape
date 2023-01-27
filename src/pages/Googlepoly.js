@@ -1,11 +1,49 @@
-import { Box, Button, Checkbox, Divider, FormControlLabel, FormGroup, Input, Slider, stepConnectorClasses, TextField, Typography } from "@mui/material";
+import { Box, Button, Checkbox, Container, Divider, FormControlLabel, FormGroup, Input, Slider, stepConnectorClasses, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Circle, GoogleMap, LoadScript, Polyline, useJsApiLoader } from '@react-google-maps/api'
 import {red, blue, green} from "@mui/material/colors"
 import ColorSlider from "../components/googlepoly/ColorSlider";
 import PolyArrow from "../components/googlepoly/PolyArrow";
+import LineController from "../components/googlepoly/LineController";
 
 export default function Googlepoly() {
+    let [options, setOptions] = useState([
+        {
+            path : [],
+            hhmmdd : false,
+            viewLine : true,
+            viewMarker : true,
+            viewArrow : false,
+            hhmmddd : false,
+            lngfirst : false,
+            lineOption : {
+                strokeOpacity: 0.8, strokeWeight: 2,
+                clickable: false, draggable: false,
+                editable: false, visible: true,
+                radius: 30000, zIndex: 1,
+                strokeColor: "#0000FF"
+            },
+            circleOption : {
+                strokeOpacity : 0, fillOpacity: 0.4,
+                clickable: false, draggable: false,
+                editable: false, visible: true,
+                radius: 1, zIndex: 1,
+                fillColor: "#FF0000"
+            }
+        },
+    ])
+
+    function addOptions() {
+        setOptions([...options, {}])
+    }
+    
+    function delOption(idx) {
+        let tmpoptions = options
+        tmpoptions.splice(idx, 1)
+        setOptions([...tmpoptions]);
+        console.log(...tmpoptions)
+    }
+
     let [coordi, setCoordi] = useState("[[37.772, -122.214],[21.291, -157.821],[18.142, 178.431],[27.467, 153.027]]");
     let [path, setPath] = useState([
         {lat: 37.772, lng: -122.214},
@@ -99,6 +137,7 @@ export default function Googlepoly() {
         })
     }
 
+    // string to line format converter
     function makeline() {
         console.log(coordi)
         let coordiString = coordi
@@ -159,6 +198,14 @@ export default function Googlepoly() {
             flexDirection: 'column',
             alignItems: 'center'
         }}>
+            <Button sx={{position : 'fixed', left : 40, top : 90}} variant="outlined" onClick={() => addOptions()}>
+                add line
+            </Button>
+            <Container sx={{display : 'flex', flexDirection : 'row', flexWrap : 'wrap' , mt : 10}}>
+            
+                {options.map((option, idx) => (<LineController key={idx} option={option} idx={idx} delLine={delOption}/>))}
+
+            </Container>
             <Box
                 sx={{
                     display : 'flex',
@@ -270,17 +317,17 @@ export default function Googlepoly() {
 
                     <Divider sx={{my:2}}/>
                     
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                justifyContent: 'space-between'
-                            }}
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between'
+                        }}
 
-                            >
-                            <FormControlLabel control={<Checkbox checked={viewLine} onChange={(e) => setViewLine(e.target.checked)}/>} label="Line" />
-                            <FormControlLabel control={<Checkbox checked={viewMarker}  onChange={(e) => setViewMarker(e.target.checked)}/>} label="Marker" />
-                            <FormControlLabel control={<Checkbox checked={viewArrow} disabled  onChange={(e) => setViewArrow(e.target.checked)}/>} label="Arrow" />
-                        </Box>
+                        >
+                        <FormControlLabel control={<Checkbox checked={viewLine} onChange={(e) => setViewLine(e.target.checked)}/>} label="Line" />
+                        <FormControlLabel control={<Checkbox checked={viewMarker}  onChange={(e) => setViewMarker(e.target.checked)}/>} label="Marker" />
+                        <FormControlLabel control={<Checkbox checked={viewArrow} disabled  onChange={(e) => setViewArrow(e.target.checked)}/>} label="Arrow" />
+                    </Box>
                 </Box>
             </Box>
 
