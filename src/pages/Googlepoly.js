@@ -1,4 +1,4 @@
-import { Box, Button, Checkbox, Divider, FormControlLabel, FormGroup, Input, Slider, stepConnectorClasses, TextField, Typography } from "@mui/material";
+import { Box, Button, Checkbox, Divider, Fade, FormControlLabel, FormGroup, Input, Menu, MenuItem, Slider, stepConnectorClasses, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Circle, GoogleMap, LoadScript, Polyline, useJsApiLoader } from '@react-google-maps/api'
 import {red, blue, green} from "@mui/material/colors"
@@ -8,12 +8,12 @@ import PolyArrow from "../components/googlepoly/PolyArrow";
 export default function Googlepoly() {
     let [coordi, setCoordi] = useState("[[37.772, -122.214],[21.291, -157.821],[18.142, 178.431],[27.467, 153.027]]");
     let [path, setPath] = useState([
-        {lat: 37.772, lng: -122.214},
-        {lat: 21.291, lng: -157.821},
-        {lat: -18.142, lng: 178.431},
-        {lat: -27.467, lng: 153.027}
+        {lat: 37.500142, lng: 127.026444},
+        {lat: 37.498578, lng: 127.027175},
+        {lat: 37.498282, lng: 127.027248},
+                
     ]);
-    let [zoom, setZoom] = useState(10);
+    let [zoom, setZoom] = useState(15);
     let [hhmmddd, setHhmmddd] = useState(false);
     let [lngfirst, setLngfirst] = useState(false);
 
@@ -46,8 +46,8 @@ export default function Googlepoly() {
     })
 
     let [center, setSenter] = useState({
-        lat: -18.142, 
-        lng: 178.431,
+        lat: 37.498578, 
+        lng: 127.027175,
     });
 
     let [containerStyle, setContainerStyle] = useState({
@@ -153,12 +153,86 @@ export default function Googlepoly() {
         })
     }
 
+    let [pointerMarker, setPointerMarker] = useState([0, 0]);
+
+    const selectCoordi = function(p) {
+        console.log(p.lat + " " + p.lng)
+    }
+
+    const setMarker = function(p) {
+        setPointerMarker(p)
+        setSenter(p)
+    }
+
+    let [pointerCircleOptions, ] = useState({
+        strokeOpacity : 0, fillOpacity: 0.8,
+        clickable: false, draggable: false,
+        editable: false, visible: true,
+        radius: 1, zIndex: 2,
+        fillColor: "#00FFA0"
+    })
+
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+    const handleClick = (event) => { setAnchorEl(event.currentTarget); };
+    const handleClose = () => { setAnchorEl(null); };
+
     return(
         <Box sx={{
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center'
         }}>
+            <Box sx={{position : 'absolute', right : 20, top : 80}}>
+                <Button
+                    variant='outlined'
+                    sx={{color : red[300]}}
+                    id="fade-button"
+                    aria-controls={open ? 'fade-menu' : undefined}
+                    aria-haspopup="true"
+                    aria-expanded={open ? 'true' : undefined}
+                    onClick={handleClick}
+                >
+                    view Path
+                </Button>
+                <Menu
+                    id="fade-menu"
+                    MenuListProps={{
+                    'aria-labelledby': 'fade-button',
+                    }}
+                    anchorEl={anchorEl}
+                    open={open}
+                    onClose={handleClose}
+                    TransitionComponent={Fade}
+                    PaperProps={{
+                        style: {
+                          maxHeight: 800,
+                          width: 250,
+                        },
+                      }}
+                >
+                    <Box>
+                        <Button size="small">reset select</Button>
+                        <Box>
+                            selected 0 :
+                        </Box>
+                        <Box>
+                            selected 1 :
+                        </Box>
+
+                    </Box>
+                    <Divider sx={{ my : 2 }}></Divider>
+                    {
+                        path.map((p) => (
+                            <MenuItem onClick={(e) => selectCoordi(p)}
+                                onPointerEnter={(e) => setMarker(p)}
+                            >
+                                {p.lat} ||  {p.lng}
+                            </MenuItem>
+                        ))
+                    }
+                </Menu>
+            </Box>
             <Box
                 sx={{
                     display : 'flex',
@@ -309,6 +383,8 @@ export default function Googlepoly() {
                             ))
                         : <></>
                     }
+
+                    <Circle center={pointerMarker} options={pointerCircleOptions} />
 
                 </GoogleMap>
 
