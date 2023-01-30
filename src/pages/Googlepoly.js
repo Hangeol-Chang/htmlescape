@@ -153,9 +153,29 @@ export default function Googlepoly() {
         })
     }
 
+    let [clat1, setClat1] = useState(0.0);
+    let [clat2, setClat2] = useState(0.0);
+    let [clng1, setClng1] = useState(0.0);
+    let [clng2, setClng2] = useState(0.0);
+    let [cdist, setCdist] = useState(0.0);
+
     let [pointerMarker, setPointerMarker] = useState([0, 0]);
     let [selected, setSelected] = useState([{}, {}])
     let [distancebetweenSelected, setDistancebetweenSelected] = useState(0);
+
+    function getDistanceFromLatLonInKm(lat1,lng1,lat2,lng2) {
+        function deg2rad(deg) { return deg * (Math.PI/180) }
+
+        console.log(lat1, lat2, lng1, lng2)
+    
+        var R = 6371; // Radius of the earth in km
+        var dLat = deg2rad(lat2-lat1);  // deg2rad below
+        var dLon = deg2rad(lng2-lng1);
+        var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        var d = R * c; // Distance in km
+        return d * 1000;
+    }
 
     const selectCoordi = function(p) {
         if(selected[0].lat) selected[1] = p;
@@ -163,21 +183,10 @@ export default function Googlepoly() {
 
         // 거리 계산
         if(selected[1].lat) {
-            const φ1 = selected[0].lat * Math.PI / 180;
-            const φ2 = selected[1].lat * Math.PI / 180;
-            const λ1 = selected[0].lng * Math.PI / 180;
-            const λ2 = selected[1].lng * Math.PI / 180;
-
-            const y = Math.sin(λ2 - λ1) * Math.cos(φ2);
-            const x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(λ2 - λ1);
-            const θ = Math.atan2(y, x); // 방위각 (라디안)
-            const bearing = (θ * 180 / Math.PI + 360) % 360;
-            
-            const aa = (φ2 - φ1)/180 * Math.PI * 6371000 / Math.cos(bearing * Math.PI / 180) * 180
-            console.log(aa)
-            distancebetweenSelected = aa;
+            setDistancebetweenSelected(getDistanceFromLatLonInKm(selected[0].lat, selected[0].lng, selected[1].lat, selected[1].lng))
+            console.log(distancebetweenSelected)
         }
-        else distancebetweenSelected = 0;
+        else setDistancebetweenSelected(0)
     }
 
     const resetSelect = function() { setSelected([{}, {}]) }
@@ -201,217 +210,235 @@ export default function Googlepoly() {
     const handleClose = () => { setAnchorEl(null); };
 
     return(
-        <Box sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center'
-        }}>
-            <Box sx={{position : 'absolute', right : 20, top : 80}}>
-                <Button
-                    variant='outlined'
-                    sx={{color : red[300]}}
-                    id="fade-button"
-                    aria-controls={open ? 'fade-menu' : undefined}
-                    aria-haspopup="true"
-                    aria-expanded={open ? 'true' : undefined}
-                    onClick={handleClick}
-                >
-                    view Path
+        <Box>
+            <Box sx={{width: 400, m : 2, p : 1, boxShadow : 1, borderRadius : 1}}>
+                <Button variant="outlined" onClick={(e) => setCdist(getDistanceFromLatLonInKm(clat1, clng1, clat2, clng2))}>
+                    calc
                 </Button>
-                <Menu
-                    id="fade-menu"
-                    MenuListProps={{
-                    'aria-labelledby': 'fade-button',
-                    }}
-                    anchorEl={anchorEl}
-                    open={open}
-                    onClose={handleClose}
-                    TransitionComponent={Fade}
-                    PaperProps={{
-                        style: {
-                          maxHeight: 800,
-                          width: 330,
-                        },
-                      }}
-                >
-                    <Box sx={{mx:1}}>
-                        <Button size="small" onClick={() => resetSelect()}>reset select</Button>
-                        <Typography variant="body1">selected 0 :</Typography>
-                        <Typography variant="body2">{selected[0].lat + " || " + selected[0].lng}</Typography>
-                        <Typography variant="body1">selected 1 :</Typography>
-                        <Typography variant="body2">{selected[1].lat + " || " + selected[1].lng}</Typography>
-                        <Typography variant="body1">distance :</Typography>
-                        <Typography variant="body2">{distancebetweenSelected}</Typography>
-
-                    </Box>
-                    <Divider sx={{ my : 2 }}></Divider>
-                    {
-                        path.map((p, idx) => (
-                            <MenuItem onClick={(e) => selectCoordi(p)}
-                                onPointerEnter={(e) => setMarker(p)}
-                            >
-                                {idx} || {p.lat} ||  {p.lng}
-                            </MenuItem>
-                        ))
-                    }
-                </Menu>
+                dist calculator || {cdist}
+                <Box>
+                    <TextField label="lat1" type="number" variant="standard" onChange={(e) => setClat1(e.target.value)}/>
+                    <TextField label="lng1" type="number" variant="standard" onChange={(e) => setClng1(e.target.value)}/>
+                </Box>
+                <Box>
+                    <TextField label="lat2" type="number" variant="standard" onChange={(e) => setClat2(e.target.value)}/>
+                    <TextField label="lng2" type="number" variant="standard" onChange={(e) => setClng2(e.target.value)}/>
+                </Box>
+                
             </Box>
-            <Box
-                sx={{
-                    display : 'flex',
-                    m:2, p:2,
-                    justifyContent: 'center',
-                    maxWidth:1000,
-                    borderRadius:2,
-                    boxShadow:1
-                }}
-            >
+
+            <Box sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center'
+            }}>
+                <Box sx={{position : 'absolute', right : 20, top : 80}}>
+                    <Button
+                        variant='outlined'
+                        sx={{color : red[300]}}
+                        id="fade-button"
+                        aria-controls={open ? 'fade-menu' : undefined}
+                        aria-haspopup="true"
+                        aria-expanded={open ? 'true' : undefined}
+                        onClick={handleClick}
+                    >
+                        view Path
+                    </Button>
+                    <Menu
+                        id="fade-menu"
+                        MenuListProps={{
+                        'aria-labelledby': 'fade-button',
+                        }}
+                        anchorEl={anchorEl}
+                        open={open}
+                        onClose={handleClose}
+                        TransitionComponent={Fade}
+                        PaperProps={{
+                            style: {
+                            maxHeight: 800,
+                            width: 330,
+                            },
+                        }}
+                    >
+                        <Box sx={{mx:1}}>
+                            <Button size="small" onClick={() => resetSelect()}>reset select</Button>
+                            <Typography variant="body1">selected 0 :</Typography>
+                            <Typography variant="body2">{selected[0].lat + " || " + selected[0].lng}</Typography>
+                            <Typography variant="body1">selected 1 :</Typography>
+                            <Typography variant="body2">{selected[1].lat + " || " + selected[1].lng}</Typography>
+                            <Typography variant="body1">distance :</Typography>
+                            <Typography variant="body2">{distancebetweenSelected}</Typography>
+
+                        </Box>
+                        <Divider sx={{ my : 2 }}></Divider>
+                        {
+                            path.map((p, idx) => (
+                                <MenuItem onClick={(e) => selectCoordi(p)}
+                                    onPointerEnter={(e) => setMarker(p)}
+                                >
+                                    {idx} || {p.lat} ||  {p.lng}
+                                </MenuItem>
+                            ))
+                        }
+                    </Menu>
+                </Box>
                 <Box
                     sx={{
                         display : 'flex',
-                        flexDirection: 'column',
-                        mx : 2
+                        m:2, p:2,
+                        justifyContent: 'center',
+                        maxWidth:1000,
+                        borderRadius:2,
+                        boxShadow:1
                     }}
                 >
-                    <TextField
-                        variant="outlined"
-                        id="inputcoordi"
-                        value={coordi}
-                        multiline rows={6} label="Input Coordinates"
-                        sx={{width:400, height:180}}
-                        onChange={(e) => setCoordi(e.target.value)}
-                    >
-                    </TextField>
-                    
-                    <Box sx={{display:'flex', alignItems:'center'}}>
-                        <FormControlLabel control={<Checkbox checked={hhmmddd} onChange={(e) => setHhmmddd(e.target.checked)}/>} label="hhmm˚ddd" />
-                        <FormControlLabel control={<Checkbox checked={lngfirst} onChange={(e) => setLngfirst(e.target.checked)}/>} label="lng_first" />
-
-                        <Button 
-                            sx={{m : 0, width: '100%', height:40}}
-                            variant="outlined" 
-                            onClick={() => makeline()}
-                        >
-                            Draw Path
-                        </Button>
-                    </Box>
-                </Box>
-
-                <Box
-                    sx={{
-                        width : 400, px:2,
-
-                        display:'flex',
-                        flexDirection: 'column'
-                    }}
-                >
-                    <Box sx={{ display : 'flex', alignItems:'center'}} >
-                        <Typography sx={{width:120, mr:2}}>
-                            Circle Size
-                        </Typography>
-                        <Slider
-                            defaultValue={1}
-                            step={0.002} min={0} max={2}
-                            valueLabelDisplay="auto"
-                            onChange={(e) => {
-                                setcircleOptions((prevState) => {
-                                    return {...prevState, radius : e.target.value}
-                                })
-                            }}
-                        />
-                    </Box>
-
-                    <Divider sx={{my:2}}/>
-
                     <Box
                         sx={{
-                            display: 'flex',
-                            alignItems: 'center'
+                            display : 'flex',
+                            flexDirection: 'column',
+                            mx : 2
                         }}
                     >
-                        <Typography sx={{width:120, mr:2}}>
-                            Circle Color
-                        </Typography>
-                        <Box
-                            sx={{
-                                display:'flex',
-                                width:'100%',
-                            }}
+                        <TextField
+                            variant="outlined"
+                            id="inputcoordi"
+                            value={coordi}
+                            multiline rows={6} label="Input Coordinates"
+                            sx={{width:400, height:180}}
+                            onChange={(e) => setCoordi(e.target.value)}
                         >
-                            <ColorSlider color={ red[500] } idf="red"   check={circleColor_r} setColor={setCircleColor} />
-                            <ColorSlider color={green[500]} idf="green" check={circleColor_g} setColor={setCircleColor} />
-                            <ColorSlider color={ blue[500]} idf="blue"  check={circleColor_b} setColor={setCircleColor} />
-                        </Box>
-                    </Box>
-                    <Divider sx={{my:2}}/>
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                        }}
-                    >
-                        <Typography sx={{width:120, mr:2}}>
-                            Line Color
-                        </Typography>
-                        <Box
-                            sx={{
-                                display:'flex',
-                                width:'100%',
-                            }}
-                        >
-                            <ColorSlider color={ red[500] } idf="red"   check={lineColor_r} setColor={setLineColor} />
-                            <ColorSlider color={green[500]} idf="green" check={lineColor_g} setColor={setLineColor} />
-                            <ColorSlider color={ blue[500]} idf="blue"  check={lineColor_b} setColor={setLineColor} />
+                        </TextField>
+                        
+                        <Box sx={{display:'flex', alignItems:'center'}}>
+                            <FormControlLabel control={<Checkbox checked={hhmmddd} onChange={(e) => setHhmmddd(e.target.checked)}/>} label="hhmm˚ddd" />
+                            <FormControlLabel control={<Checkbox checked={lngfirst} onChange={(e) => setLngfirst(e.target.checked)}/>} label="lng_first" />
+
+                            <Button 
+                                sx={{m : 0, width: '100%', height:40}}
+                                variant="outlined" 
+                                onClick={() => makeline()}
+                            >
+                                Draw Path
+                            </Button>
                         </Box>
                     </Box>
 
-                    <Divider sx={{my:2}}/>
-                    
+                    <Box
+                        sx={{
+                            width : 400, px:2,
+
+                            display:'flex',
+                            flexDirection: 'column'
+                        }}
+                    >
+                        <Box sx={{ display : 'flex', alignItems:'center'}} >
+                            <Typography sx={{width:120, mr:2}}>
+                                Circle Size
+                            </Typography>
+                            <Slider
+                                defaultValue={1}
+                                step={0.002} min={0} max={2}
+                                valueLabelDisplay="auto"
+                                onChange={(e) => {
+                                    setcircleOptions((prevState) => {
+                                        return {...prevState, radius : e.target.value}
+                                    })
+                                }}
+                            />
+                        </Box>
+
+                        <Divider sx={{my:2}}/>
+
                         <Box
                             sx={{
                                 display: 'flex',
-                                justifyContent: 'space-between'
+                                alignItems: 'center'
                             }}
-
+                        >
+                            <Typography sx={{width:120, mr:2}}>
+                                Circle Color
+                            </Typography>
+                            <Box
+                                sx={{
+                                    display:'flex',
+                                    width:'100%',
+                                }}
                             >
-                            <FormControlLabel control={<Checkbox checked={viewLine} onChange={(e) => setViewLine(e.target.checked)}/>} label="Line" />
-                            <FormControlLabel control={<Checkbox checked={viewMarker}  onChange={(e) => setViewMarker(e.target.checked)}/>} label="Marker" />
-                            <FormControlLabel control={<Checkbox checked={viewArrow} disabled  onChange={(e) => setViewArrow(e.target.checked)}/>} label="Arrow" />
+                                <ColorSlider color={ red[500] } idf="red"   check={circleColor_r} setColor={setCircleColor} />
+                                <ColorSlider color={green[500]} idf="green" check={circleColor_g} setColor={setCircleColor} />
+                                <ColorSlider color={ blue[500]} idf="blue"  check={circleColor_b} setColor={setCircleColor} />
+                            </Box>
                         </Box>
+                        <Divider sx={{my:2}}/>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                            }}
+                        >
+                            <Typography sx={{width:120, mr:2}}>
+                                Line Color
+                            </Typography>
+                            <Box
+                                sx={{
+                                    display:'flex',
+                                    width:'100%',
+                                }}
+                            >
+                                <ColorSlider color={ red[500] } idf="red"   check={lineColor_r} setColor={setLineColor} />
+                                <ColorSlider color={green[500]} idf="green" check={lineColor_g} setColor={setLineColor} />
+                                <ColorSlider color={ blue[500]} idf="blue"  check={lineColor_b} setColor={setLineColor} />
+                            </Box>
+                        </Box>
+
+                        <Divider sx={{my:2}}/>
+                        
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between'
+                                }}
+
+                                >
+                                <FormControlLabel control={<Checkbox checked={viewLine} onChange={(e) => setViewLine(e.target.checked)}/>} label="Line" />
+                                <FormControlLabel control={<Checkbox checked={viewMarker}  onChange={(e) => setViewMarker(e.target.checked)}/>} label="Marker" />
+                                <FormControlLabel control={<Checkbox checked={viewArrow} disabled  onChange={(e) => setViewArrow(e.target.checked)}/>} label="Arrow" />
+                            </Box>
+                    </Box>
                 </Box>
-            </Box>
 
-            <LoadScript
-                googleMapsApiKey="AIzaSyBkZS2y5XLGTz09p372w0MV4bQgeukEiiQ"
-            >
-                <GoogleMap
-                    mapContainerStyle={containerStyle}
-                    center={center}
-                    zoom={zoom}
+                <LoadScript
+                    googleMapsApiKey="AIzaSyBkZS2y5XLGTz09p372w0MV4bQgeukEiiQ"
                 >
-                    {
-                        viewLine ? <Polyline path={path} options={lineOptions} />
-                        : <></>
-                    }
-                    
-                    {/* {
-                        viewArrow ? <PolyArrow path={path} lineOptions={lineOptions} />
-                        : <></>
-                    } */}
+                    <GoogleMap
+                        mapContainerStyle={containerStyle}
+                        center={center}
+                        zoom={zoom}
+                    >
+                        {
+                            viewLine ? <Polyline path={path} options={lineOptions} />
+                            : <></>
+                        }
+                        
+                        {/* {
+                            viewArrow ? <PolyArrow path={path} lineOptions={lineOptions} />
+                            : <></>
+                        } */}
 
-                    {
-                        viewMarker ? 
-                            path.map((c, idx) => (
-                                <Circle center={c} key={idx} options={circleOptions} />
-                            ))
-                        : <></>
-                    }
+                        {
+                            viewMarker ? 
+                                path.map((c, idx) => (
+                                    <Circle center={c} key={idx} options={circleOptions} />
+                                ))
+                            : <></>
+                        }
 
-                    <Circle center={pointerMarker} options={pointerCircleOptions} />
+                        <Circle center={pointerMarker} options={pointerCircleOptions} />
 
-                </GoogleMap>
+                    </GoogleMap>
 
-            </LoadScript>
+                </LoadScript>
+            </Box>
         </Box>
     )
 }
