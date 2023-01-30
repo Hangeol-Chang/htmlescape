@@ -154,14 +154,37 @@ export default function Googlepoly() {
     }
 
     let [pointerMarker, setPointerMarker] = useState([0, 0]);
+    let [selected, setSelected] = useState([{}, {}])
+    let [distancebetweenSelected, setDistancebetweenSelected] = useState(0);
 
     const selectCoordi = function(p) {
-        console.log(p.lat + " " + p.lng)
+        if(selected[0].lat) selected[1] = p;
+        else                selected[0] = p;
+
+        // 거리 계산
+        if(selected[1].lat) {
+            const φ1 = selected[0].lat * Math.PI / 180;
+            const φ2 = selected[1].lat * Math.PI / 180;
+            const λ1 = selected[0].lng * Math.PI / 180;
+            const λ2 = selected[1].lng * Math.PI / 180;
+
+            const y = Math.sin(λ2 - λ1) * Math.cos(φ2);
+            const x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(λ2 - λ1);
+            const θ = Math.atan2(y, x); // 방위각 (라디안)
+            const bearing = (θ * 180 / Math.PI + 360) % 360;
+            
+            const aa = (φ2 - φ1)/180 * Math.PI * 6371000 / Math.cos(bearing * Math.PI / 180) * 180
+            console.log(aa)
+            distancebetweenSelected = aa;
+        }
+        else distancebetweenSelected = 0;
     }
+
+    const resetSelect = function() { setSelected([{}, {}]) }
 
     const setMarker = function(p) {
         setPointerMarker(p)
-        setSenter(p)
+        setSenter(p)    
     }
 
     let [pointerCircleOptions, ] = useState({
@@ -207,27 +230,27 @@ export default function Googlepoly() {
                     PaperProps={{
                         style: {
                           maxHeight: 800,
-                          width: 250,
+                          width: 330,
                         },
                       }}
                 >
-                    <Box>
-                        <Button size="small">reset select</Button>
-                        <Box>
-                            selected 0 :
-                        </Box>
-                        <Box>
-                            selected 1 :
-                        </Box>
+                    <Box sx={{mx:1}}>
+                        <Button size="small" onClick={() => resetSelect()}>reset select</Button>
+                        <Typography variant="body1">selected 0 :</Typography>
+                        <Typography variant="body2">{selected[0].lat + " || " + selected[0].lng}</Typography>
+                        <Typography variant="body1">selected 1 :</Typography>
+                        <Typography variant="body2">{selected[1].lat + " || " + selected[1].lng}</Typography>
+                        <Typography variant="body1">distance :</Typography>
+                        <Typography variant="body2">{distancebetweenSelected}</Typography>
 
                     </Box>
                     <Divider sx={{ my : 2 }}></Divider>
                     {
-                        path.map((p) => (
+                        path.map((p, idx) => (
                             <MenuItem onClick={(e) => selectCoordi(p)}
                                 onPointerEnter={(e) => setMarker(p)}
                             >
-                                {p.lat} ||  {p.lng}
+                                {idx} || {p.lat} ||  {p.lng}
                             </MenuItem>
                         ))
                     }
