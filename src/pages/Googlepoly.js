@@ -59,12 +59,12 @@ export default function Googlepoly() {
 
     let [coordi, setCoordi] = useState("[[37.772, -122.214],[21.291, -157.821],[18.142, 178.431],[27.467, 153.027]]");
     let [path, setPath] = useState([
-        {lat: 37.772, lng: -122.214},
-        {lat: 21.291, lng: -157.821},
-        {lat: -18.142, lng: 178.431},
-        {lat: -27.467, lng: 153.027}
+        {lat: 37.500142, lng: 127.026444},
+        {lat: 37.498578, lng: 127.027175},
+        {lat: 37.498282, lng: 127.027248},
+                
     ]);
-    let [zoom, setZoom] = useState(10);
+    let [zoom, setZoom] = useState(15);
     let [hhmmddd, setHhmmddd] = useState(false);
     let [lngfirst, setLngfirst] = useState(false);
 
@@ -97,8 +97,8 @@ export default function Googlepoly() {
     })
 
     let [center, setSenter] = useState({
-        lat: -18.142, 
-        lng: 178.431,
+        lat: 37.498578, 
+        lng: 127.027175,
     });
 
     let [containerStyle, setContainerStyle] = useState({
@@ -205,6 +205,62 @@ export default function Googlepoly() {
         })
     }
 
+    let [clat1, setClat1] = useState(0.0);
+    let [clat2, setClat2] = useState(0.0);
+    let [clng1, setClng1] = useState(0.0);
+    let [clng2, setClng2] = useState(0.0);
+    let [cdist, setCdist] = useState(0.0);
+
+    let [pointerMarker, setPointerMarker] = useState([0, 0]);
+    let [selected, setSelected] = useState([{}, {}])
+    let [distancebetweenSelected, setDistancebetweenSelected] = useState(0);
+
+    function getDistanceFromLatLonInKm(lat1,lng1,lat2,lng2) {
+        function deg2rad(deg) { return deg * (Math.PI/180) }
+
+        console.log(lat1, lat2, lng1, lng2)
+    
+        var R = 6371; // Radius of the earth in km
+        var dLat = deg2rad(lat2-lat1);  // deg2rad below
+        var dLon = deg2rad(lng2-lng1);
+        var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        var d = R * c; // Distance in km
+        return d * 1000;
+    }
+
+    const selectCoordi = function(p) {
+        if(selected[0].lat) selected[1] = p;
+        else                selected[0] = p;
+
+        // 거리 계산
+        if(selected[1].lat) {
+            setDistancebetweenSelected(getDistanceFromLatLonInKm(selected[0].lat, selected[0].lng, selected[1].lat, selected[1].lng))
+            console.log(distancebetweenSelected)
+        }
+        else setDistancebetweenSelected(0)
+    }
+
+    const resetSelect = function() { setSelected([{}, {}]) }
+
+    const setMarker = function(p) {
+        setPointerMarker(p)
+        setSenter(p)    
+    }
+
+    let [pointerCircleOptions, ] = useState({
+        strokeOpacity : 0, fillOpacity: 0.8,
+        clickable: false, draggable: false,
+        editable: false, visible: true,
+        radius: 1, zIndex: 2,
+        fillColor: "#00FFA0"
+    })
+
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+    const handleClick = (event) => { setAnchorEl(event.currentTarget); };
+    const handleClose = () => { setAnchorEl(null); };
+
     return(
         <Box sx={{
             display: 'flex',
@@ -259,72 +315,154 @@ export default function Googlepoly() {
                         </Button>
                     </Box>
                 </Box>
+                <Box>
+                    <TextField label="lat2" type="number" variant="standard" onChange={(e) => setClat2(e.target.value)}/>
+                    <TextField label="lng2" type="number" variant="standard" onChange={(e) => setClng2(e.target.value)}/>
+                </Box>
+                
+            </Box>
 
+            <Box sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center'
+            }}>
+                <Box sx={{position : 'absolute', right : 20, top : 80}}>
+                    <Button
+                        variant='outlined'
+                        sx={{color : red[300]}}
+                        id="fade-button"
+                        aria-controls={open ? 'fade-menu' : undefined}
+                        aria-haspopup="true"
+                        aria-expanded={open ? 'true' : undefined}
+                        onClick={handleClick}
+                    >
+                        view Path
+                    </Button>
+                    <Menu
+                        id="fade-menu"
+                        MenuListProps={{
+                        'aria-labelledby': 'fade-button',
+                        }}
+                        anchorEl={anchorEl}
+                        open={open}
+                        onClose={handleClose}
+                        TransitionComponent={Fade}
+                        PaperProps={{
+                            style: {
+                            maxHeight: 800,
+                            width: 330,
+                            },
+                        }}
+                    >
+                        <Box sx={{mx:1}}>
+                            <Button size="small" onClick={() => resetSelect()}>reset select</Button>
+                            <Typography variant="body1">selected 0 :</Typography>
+                            <Typography variant="body2">{selected[0].lat + " || " + selected[0].lng}</Typography>
+                            <Typography variant="body1">selected 1 :</Typography>
+                            <Typography variant="body2">{selected[1].lat + " || " + selected[1].lng}</Typography>
+                            <Typography variant="body1">distance :</Typography>
+                            <Typography variant="body2">{distancebetweenSelected}</Typography>
+
+                        </Box>
+                        <Divider sx={{ my : 2 }}></Divider>
+                        {
+                            path.map((p, idx) => (
+                                <MenuItem onClick={(e) => selectCoordi(p)}
+                                    onPointerEnter={(e) => setMarker(p)}
+                                >
+                                    {idx} || {p.lat} ||  {p.lng}
+                                </MenuItem>
+                            ))
+                        }
+                    </Menu>
+                </Box>
                 <Box
                     sx={{
-                        width : 400, px:2,
-
-                        display:'flex',
-                        flexDirection: 'column'
+                        display : 'flex',
+                        m:2, p:2,
+                        justifyContent: 'center',
+                        maxWidth:1000,
+                        borderRadius:2,
+                        boxShadow:1
                     }}
                 >
-                    <Box sx={{ display : 'flex', alignItems:'center'}} >
-                        <Typography sx={{width:120, mr:2}}>
-                            Circle Size
-                        </Typography>
-                        <Slider
-                            defaultValue={1}
-                            step={0.002} min={0} max={2}
-                            valueLabelDisplay="auto"
-                            onChange={(e) => {
-                                setcircleOptions((prevState) => {
-                                    return {...prevState, radius : e.target.value}
-                                })
-                            }}
-                        />
-                    </Box>
-
-                    <Divider sx={{my:2}}/>
-
                     <Box
                         sx={{
-                            display: 'flex',
-                            alignItems: 'center'
+                            display : 'flex',
+                            flexDirection: 'column',
+                            mx : 2
                         }}
                     >
-                        <Typography sx={{width:120, mr:2}}>
-                            Circle Color
-                        </Typography>
-                        <Box
-                            sx={{
-                                display:'flex',
-                                width:'100%',
-                            }}
+                        <TextField
+                            variant="outlined"
+                            id="inputcoordi"
+                            value={coordi}
+                            multiline rows={6} label="Input Coordinates"
+                            sx={{width:400, height:180}}
+                            onChange={(e) => setCoordi(e.target.value)}
                         >
-                            <ColorSlider color={ red[500] } idf="red"   check={circleColor_r} setColor={setCircleColor} />
-                            <ColorSlider color={green[500]} idf="green" check={circleColor_g} setColor={setCircleColor} />
-                            <ColorSlider color={ blue[500]} idf="blue"  check={circleColor_b} setColor={setCircleColor} />
+                        </TextField>
+                        
+                        <Box sx={{display:'flex', alignItems:'center'}}>
+                            <FormControlLabel control={<Checkbox checked={hhmmddd} onChange={(e) => setHhmmddd(e.target.checked)}/>} label="hhmm˚ddd" />
+                            <FormControlLabel control={<Checkbox checked={lngfirst} onChange={(e) => setLngfirst(e.target.checked)}/>} label="lng_first" />
+
+                            <Button 
+                                sx={{m : 0, width: '100%', height:40}}
+                                variant="outlined" 
+                                onClick={() => makeline()}
+                            >
+                                Draw Path
+                            </Button>
                         </Box>
                     </Box>
-                    <Divider sx={{my:2}}/>
+
                     <Box
                         sx={{
-                            display: 'flex',
-                            alignItems: 'center',
+                            width : 400, px:2,
+
+                            display:'flex',
+                            flexDirection: 'column'
                         }}
                     >
-                        <Typography sx={{width:120, mr:2}}>
-                            Line Color
-                        </Typography>
+                        <Box sx={{ display : 'flex', alignItems:'center'}} >
+                            <Typography sx={{width:120, mr:2}}>
+                                Circle Size
+                            </Typography>
+                            <Slider
+                                defaultValue={1}
+                                step={0.002} min={0} max={2}
+                                valueLabelDisplay="auto"
+                                onChange={(e) => {
+                                    setcircleOptions((prevState) => {
+                                        return {...prevState, radius : e.target.value}
+                                    })
+                                }}
+                            />
+                        </Box>
+
+                        <Divider sx={{my:2}}/>
+
                         <Box
                             sx={{
-                                display:'flex',
-                                width:'100%',
+                                display: 'flex',
+                                alignItems: 'center'
                             }}
                         >
-                            <ColorSlider color={ red[500] } idf="red"   check={lineColor_r} setColor={setLineColor} />
-                            <ColorSlider color={green[500]} idf="green" check={lineColor_g} setColor={setLineColor} />
-                            <ColorSlider color={ blue[500]} idf="blue"  check={lineColor_b} setColor={setLineColor} />
+                            <Typography sx={{width:120, mr:2}}>
+                                Circle Color
+                            </Typography>
+                            <Box
+                                sx={{
+                                    display:'flex',
+                                    width:'100%',
+                                }}
+                            >
+                                <ColorSlider color={ red[500] } idf="red"   check={circleColor_r} setColor={setCircleColor} />
+                                <ColorSlider color={green[500]} idf="green" check={circleColor_g} setColor={setCircleColor} />
+                                <ColorSlider color={ blue[500]} idf="blue"  check={circleColor_b} setColor={setCircleColor} />
+                            </Box>
                         </Box>
                     </Box>
 
@@ -342,37 +480,39 @@ export default function Googlepoly() {
                         <FormControlLabel control={<Checkbox checked={viewArrow} disabled  onChange={(e) => setViewArrow(e.target.checked)}/>} label="Arrow" />
                     </Box>
                 </Box>
-            </Box>
 
-            <LoadScript
-                googleMapsApiKey="AIzaSyBkZS2y5XLGTz09p372w0MV4bQgeukEiiQ"
-            >
-                <GoogleMap
-                    mapContainerStyle={containerStyle}
-                    center={center}
-                    zoom={zoom}
+                <LoadScript
+                    googleMapsApiKey="AIzaSyBkZS2y5XLGTz09p372w0MV4bQgeukEiiQ"
                 >
-                    {
-                        viewLine ? <Polyline path={path} options={lineOptions} />
-                        : <></>
-                    }
-                    
-                    {/* {
-                        viewArrow ? <PolyArrow path={path} lineOptions={lineOptions} />
-                        : <></>
-                    } */}
+                    <GoogleMap
+                        mapContainerStyle={containerStyle}
+                        center={center}
+                        zoom={zoom}
+                    >
+                        {
+                            viewLine ? <Polyline path={path} options={lineOptions} />
+                            : <></>
+                        }
+                        
+                        {/* {
+                            viewArrow ? <PolyArrow path={path} lineOptions={lineOptions} />
+                            : <></>
+                        } */}
 
-                    {
-                        viewMarker ? 
-                            path.map((c, idx) => (
-                                <Circle center={c} key={idx} options={circleOptions} />
-                            ))
-                        : <></>
-                    }
+                        {
+                            viewMarker ? 
+                                path.map((c, idx) => (
+                                    <Circle center={c} key={idx} options={circleOptions} />
+                                ))
+                            : <></>
+                        }
 
-                </GoogleMap>
+                        <Circle center={pointerMarker} options={pointerCircleOptions} />
 
-            </LoadScript>
+                    </GoogleMap>
+
+                </LoadScript>
+            </Box>
         </Box>
     )
 }
