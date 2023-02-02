@@ -11,7 +11,7 @@ export default function Googlepoly() {
     const iniOption = {
         path : [{lat: 37.500142, lng: 127.026444},
             {lat: 37.498578, lng: 127.027175},
-            {lat: 37.498282, lng: 127.027248},],
+            {lat: 37.498282, lng: 127.027248}],
         hhmmdd : false,
         viewLine : true,
         viewMarker : true,
@@ -332,12 +332,16 @@ export default function Googlepoly() {
                         variant="outlined"
                         value={coordi}
                         multiline rows={3} label="Input Coordinates"
-                        sx={{width:300, height:60}}
+                        sx={{width:300, height:100}}
                         onChange={(e) => setCoordi(e.target.value)}
                     >
                     </TextField>
                     
                     <Button variant="outlined" onClick={() => addLine(coordi)}>add line</Button>
+                    <Box sx={{display : 'flex', alignItems : 'center'}}>
+                        <FormControlLabel control={<Checkbox checked={hhmmddd} onChange={(e) => setHhmmddd(e.target.checked)}/>} label="hhmm˚ddd" />
+                        <FormControlLabel control={<Checkbox checked={lngfirst} onChange={(e) => setLngfirst(e.target.checked)}/>} label="lng_first" />
+                    </Box>
                 </Box>
 
             </Box>

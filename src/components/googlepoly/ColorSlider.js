@@ -6,7 +6,7 @@ export default function ColorSlider(props) {
             sx={{ color: props.color, mx:1 }} value={props.check} 
             defaultValue={0} min={0} max={255}
             valueLabelDisplay="auto"
-            onChange={(e) => props.setColor(e.target.value, props.idf)}
+            onChangeCommitted={(e) => props.setColor(e.target.value, props.idf)}
         />
     )
 }
