@@ -39,6 +39,8 @@ export default function Googlepoly() {
 
     function addOptions() { setOptions([...options, iniOption]); console.log(options) }
     
+    const configOption = function(idf, opt) { setOptions({...options, [idf] : opt}) }
+    
     function delOption(idf) {
         let tmpoptions = options
         delete tmpoptions[idf];
@@ -98,7 +100,6 @@ export default function Googlepoly() {
         
         console.log(options)
     }
-    function configOptions(idf, val) { setOptions({...options, idf : val}) }
 
     let [coordi, setCoordi] = useState("[[37.772, -122.214],[21.291, -157.821],[18.142, 178.431],[27.467, 153.027]]");
     let [path, setPath] = useState([
@@ -287,7 +288,7 @@ export default function Googlepoly() {
 
     const setMarker = function(p) {
         setPointerMarker(p)
-        setSenter(p)    
+        setSenter(p)
     }
 
     let [pointerCircleOptions, ] = useState({
@@ -309,70 +310,48 @@ export default function Googlepoly() {
             flexDirection: 'column',
             alignItems: 'center'
         }}>
-            <Box  sx={{m : 2}} >
-                <TextField
-                    variant="outlined"
-                    value={coordi}
-                    multiline rows={3} label="Input Coordinates"
-                    sx={{width:300, height:60}}
-                    onChange={(e) => setCoordi(e.target.value)}
-                >
-                </TextField>
-                
-                <Button variant="outlined" onClick={() => addLine(coordi)}>
-                    add line
-                </Button>
-            </Box>
-            <Container sx={{display : 'flex', flexDirection : 'row', flexWrap : 'wrap' , mt : 10}}>
-            
-                {idfs.map((idf) => (<LineController key={idf} option={options[idf]} idf={idf} delLine={delOption}/>))}
+            <Box sx={{display : 'flex', m : 2}}>
+                <Box sx={{ width : 420, m : 2, p : 1 , boxShadow : 1, borderRadius : 1}} >
+                    <Button variant="outlined" onClick={(e) => setCdist(getDistanceFromLatLonInKm(clat1, clng1, clat2, clng2))}>
+                        calc
+                    </Button>
+                    dist calcurator || {cdist}
 
-            </Container>
-            <Box
-                sx={{
-                    display : 'flex',
-                    m:2, p:2,
-                    justifyContent: 'center',
-                    maxWidth:1000,
-                    borderRadius:2,
-                    boxShadow:1
-                }}
-            >
-                <Box
-                    sx={{
-                        display : 'flex',
-                        flexDirection: 'column',
-                        mx : 2
-                    }}
-                >
+                    <Box>
+                        <TextField label="lat1" type="number" variant="standard" onChange={(e) => setClat1(e.target.value)}/>
+                        <TextField label="lng1" type="number" variant="standard" onChange={(e) => setClng1(e.target.value)}/>
+                    </Box>
+                    <Box>
+                        <TextField label="lat2" type="number" variant="standard" onChange={(e) => setClat2(e.target.value)}/>
+                        <TextField label="lng2" type="number" variant="standard" onChange={(e) => setClng2(e.target.value)}/>
+                    </Box>
+                </Box>
+
+                <Box  sx={{m : 2}} >
                     <TextField
                         variant="outlined"
                         value={coordi}
-                        multiline rows={6} label="Input Coordinates"
-                        sx={{width:400, height:180}}
+                        multiline rows={3} label="Input Coordinates"
+                        sx={{width:300, height:60}}
                         onChange={(e) => setCoordi(e.target.value)}
                     >
                     </TextField>
                     
-                    <Box sx={{display:'flex', alignItems:'center'}}>
-                        <FormControlLabel control={<Checkbox checked={hhmmddd} onChange={(e) => setHhmmddd(e.target.checked)}/>} label="hhmm˚ddd" />
-                        <FormControlLabel control={<Checkbox checked={lngfirst} onChange={(e) => setLngfirst(e.target.checked)}/>} label="lng_first" />
+                    <Button variant="outlined" onClick={() => addLine(coordi)}>add line</Button>
+                </Box>
 
-                        <Button 
-                            sx={{m : 0, width: '100%', height:40}}
-                            variant="outlined" 
-                            onClick={() => makeline()}
-                        >
-                            Draw Path
-                        </Button>
-                    </Box>
-                </Box>
-                <Box>
-                    <TextField label="lat2" type="number" variant="standard" onChange={(e) => setClat2(e.target.value)}/>
-                    <TextField label="lng2" type="number" variant="standard" onChange={(e) => setClng2(e.target.value)}/>
-                </Box>
-                
             </Box>
+            <Container sx={{display : 'flex', flexDirection : 'row', flexWrap : 'wrap' , mt : 10}}>
+            
+                {idfs.map((idf) => (
+                    <LineController 
+                        key={idf} idf={idf} 
+                        configCompOption={configOption}
+                        option={options[idf]} 
+                        delLine={delOption}/>
+                ))}
+
+            </Container>
 
             <Box sx={{
                 display: 'flex',
