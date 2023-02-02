@@ -1,4 +1,4 @@
-import { Box, Button, Checkbox, Container, Divider, FormControlLabel, FormGroup, Input, Slider, stepConnectorClasses, TextField, Typography } from "@mui/material";
+import { Box, Button, Checkbox, Container, Divider, Fade, FormControlLabel, FormGroup, Input, Menu, MenuItem, Slider, stepConnectorClasses, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Circle, GoogleMap, LoadScript, Polyline, useJsApiLoader } from '@react-google-maps/api'
 import {red, blue, green} from "@mui/material/colors"
@@ -9,7 +9,9 @@ import LineController from "../components/googlepoly/LineController";
 export default function Googlepoly() {
     // line이 초기화될 때 가지고 있을 값.
     const iniOption = {
-        path : [],
+        path : [{lat: 37.500142, lng: 127.026444},
+            {lat: 37.498578, lng: 127.027175},
+            {lat: 37.498282, lng: 127.027248},],
         hhmmdd : false,
         viewLine : true,
         viewMarker : true,
@@ -31,31 +33,72 @@ export default function Googlepoly() {
             fillColor: "#FF0000"
         }
     }
-
-    let [options, setOptions] = useState([ iniOption ])
+    let [idfs, setIdfs] = useState([0]);
+    let [idfCount, setIdfCount] = useState(1);
+    let [options, setOptions] = useState( { 0 : iniOption } )
 
     function addOptions() { setOptions([...options, iniOption]); console.log(options) }
     
-    function delOption(idx) {
+    function delOption(idf) {
         let tmpoptions = options
-        tmpoptions.splice(idx, 1)
-        setOptions([...tmpoptions]);
-        console.log(...tmpoptions)
+        delete tmpoptions[idf];
+        setOptions(tmpoptions);
+        setIdfs(idfs.filter((ele) => ele != idf))
+
     }
-    
-    function configCompOptions(idx, idf, val) {
-        switch(idf) {
-            case "aa":
 
-                break;
-            case "radius":
+    const convertrawCoorditoCoordi = function(coordi) {
+        let coordiString = coordi
+            .replaceAll("[", "")
+            .replaceAll("]", "")
+            .replaceAll(" ", "")
+            .replaceAll("\t", ",")
+            .replaceAll("\n", ",")
 
-                break;
-            default :
-                console.log("no matched idf for : " + idf);
+        const coordiArr = coordiString.split(",").map(Number); 
+        const len = parseInt(coordiArr.length)*2;
+        let tmpPath = []
+
+        let latidf = 0;
+        let lngidf = 1;
+        if(lngfirst) { latidf = 1; lngidf = 0; }
+        
+        for (let i = 0; i < len; i += 2) {
+            let tmplat = coordiArr[i + latidf];
+            let tmplng = coordiArr[i + lngidf];
+
+            if(hhmmddd) {
+                tmplat = parseInt(tmplat / 100) + tmplat % 100 / 60;
+                tmplng = parseInt(tmplng / 100) + tmplng % 100 / 60;
+                // tmplat = parseInt(tmplat / 100) + parseInt(tmplat % 100) / 60 + (tmplat % 1)*100 / 3600;
+                // tmplng = parseInt(tmplng / 100) + parseInt(tmplng % 100) / 60 + (tmplng % 1)*100 / 3600;
+            }
+            console.log(tmplat + " " + tmplng)
+
+            if((Math.abs(tmplat) < 1 || Math.abs(tmplng) < 1)) continue;
+            if(!tmplat || !tmplng) break;
+            
+            tmpPath.push({
+                "lat" : tmplat,
+                "lng" : tmplng
+            })
         }
 
+        return tmpPath;
     }
+    
+    const addLine = function(rawCoordi) {
+        let newLine = iniOption;
+        newLine.path = convertrawCoorditoCoordi(rawCoordi);
+
+        let conut = idfCount
+        setOptions({...options, [idfCount] : iniOption });
+        setIdfs([...idfs, idfCount])
+        setIdfCount(idfCount + 1);
+        
+        console.log(options)
+    }
+    function configOptions(idf, val) { setOptions({...options, idf : val}) }
 
     let [coordi, setCoordi] = useState("[[37.772, -122.214],[21.291, -157.821],[18.142, 178.431],[27.467, 153.027]]");
     let [path, setPath] = useState([
@@ -152,7 +195,6 @@ export default function Googlepoly() {
 
     // string to line format converter
     function makeline() {
-        console.log(coordi)
         let coordiString = coordi
             .replaceAll("[", "")
             .replaceAll("]", "")
@@ -267,12 +309,23 @@ export default function Googlepoly() {
             flexDirection: 'column',
             alignItems: 'center'
         }}>
-            <Button sx={{position : 'fixed', left : 40, top : 90}} variant="outlined" onClick={() => addOptions()}>
-                add line
-            </Button>
+            <Box  sx={{m : 2}} >
+                <TextField
+                    variant="outlined"
+                    value={coordi}
+                    multiline rows={3} label="Input Coordinates"
+                    sx={{width:300, height:60}}
+                    onChange={(e) => setCoordi(e.target.value)}
+                >
+                </TextField>
+                
+                <Button variant="outlined" onClick={() => addLine(coordi)}>
+                    add line
+                </Button>
+            </Box>
             <Container sx={{display : 'flex', flexDirection : 'row', flexWrap : 'wrap' , mt : 10}}>
             
-                {options.map((option, idx) => (<LineController key={idx} option={option} idx={idx} delLine={delOption}/>))}
+                {idfs.map((idf) => (<LineController key={idf} option={options[idf]} idf={idf} delLine={delOption}/>))}
 
             </Container>
             <Box
@@ -294,7 +347,6 @@ export default function Googlepoly() {
                 >
                     <TextField
                         variant="outlined"
-                        id="inputcoordi"
                         value={coordi}
                         multiline rows={6} label="Input Coordinates"
                         sx={{width:400, height:180}}
@@ -327,159 +379,6 @@ export default function Googlepoly() {
                 flexDirection: 'column',
                 alignItems: 'center'
             }}>
-                <Box sx={{position : 'absolute', right : 20, top : 80}}>
-                    <Button
-                        variant='outlined'
-                        sx={{color : red[300]}}
-                        id="fade-button"
-                        aria-controls={open ? 'fade-menu' : undefined}
-                        aria-haspopup="true"
-                        aria-expanded={open ? 'true' : undefined}
-                        onClick={handleClick}
-                    >
-                        view Path
-                    </Button>
-                    <Menu
-                        id="fade-menu"
-                        MenuListProps={{
-                        'aria-labelledby': 'fade-button',
-                        }}
-                        anchorEl={anchorEl}
-                        open={open}
-                        onClose={handleClose}
-                        TransitionComponent={Fade}
-                        PaperProps={{
-                            style: {
-                            maxHeight: 800,
-                            width: 330,
-                            },
-                        }}
-                    >
-                        <Box sx={{mx:1}}>
-                            <Button size="small" onClick={() => resetSelect()}>reset select</Button>
-                            <Typography variant="body1">selected 0 :</Typography>
-                            <Typography variant="body2">{selected[0].lat + " || " + selected[0].lng}</Typography>
-                            <Typography variant="body1">selected 1 :</Typography>
-                            <Typography variant="body2">{selected[1].lat + " || " + selected[1].lng}</Typography>
-                            <Typography variant="body1">distance :</Typography>
-                            <Typography variant="body2">{distancebetweenSelected}</Typography>
-
-                        </Box>
-                        <Divider sx={{ my : 2 }}></Divider>
-                        {
-                            path.map((p, idx) => (
-                                <MenuItem onClick={(e) => selectCoordi(p)}
-                                    onPointerEnter={(e) => setMarker(p)}
-                                >
-                                    {idx} || {p.lat} ||  {p.lng}
-                                </MenuItem>
-                            ))
-                        }
-                    </Menu>
-                </Box>
-                <Box
-                    sx={{
-                        display : 'flex',
-                        m:2, p:2,
-                        justifyContent: 'center',
-                        maxWidth:1000,
-                        borderRadius:2,
-                        boxShadow:1
-                    }}
-                >
-                    <Box
-                        sx={{
-                            display : 'flex',
-                            flexDirection: 'column',
-                            mx : 2
-                        }}
-                    >
-                        <TextField
-                            variant="outlined"
-                            id="inputcoordi"
-                            value={coordi}
-                            multiline rows={6} label="Input Coordinates"
-                            sx={{width:400, height:180}}
-                            onChange={(e) => setCoordi(e.target.value)}
-                        >
-                        </TextField>
-                        
-                        <Box sx={{display:'flex', alignItems:'center'}}>
-                            <FormControlLabel control={<Checkbox checked={hhmmddd} onChange={(e) => setHhmmddd(e.target.checked)}/>} label="hhmm˚ddd" />
-                            <FormControlLabel control={<Checkbox checked={lngfirst} onChange={(e) => setLngfirst(e.target.checked)}/>} label="lng_first" />
-
-                            <Button 
-                                sx={{m : 0, width: '100%', height:40}}
-                                variant="outlined" 
-                                onClick={() => makeline()}
-                            >
-                                Draw Path
-                            </Button>
-                        </Box>
-                    </Box>
-
-                    <Box
-                        sx={{
-                            width : 400, px:2,
-
-                            display:'flex',
-                            flexDirection: 'column'
-                        }}
-                    >
-                        <Box sx={{ display : 'flex', alignItems:'center'}} >
-                            <Typography sx={{width:120, mr:2}}>
-                                Circle Size
-                            </Typography>
-                            <Slider
-                                defaultValue={1}
-                                step={0.002} min={0} max={2}
-                                valueLabelDisplay="auto"
-                                onChange={(e) => {
-                                    setcircleOptions((prevState) => {
-                                        return {...prevState, radius : e.target.value}
-                                    })
-                                }}
-                            />
-                        </Box>
-
-                        <Divider sx={{my:2}}/>
-
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                alignItems: 'center'
-                            }}
-                        >
-                            <Typography sx={{width:120, mr:2}}>
-                                Circle Color
-                            </Typography>
-                            <Box
-                                sx={{
-                                    display:'flex',
-                                    width:'100%',
-                                }}
-                            >
-                                <ColorSlider color={ red[500] } idf="red"   check={circleColor_r} setColor={setCircleColor} />
-                                <ColorSlider color={green[500]} idf="green" check={circleColor_g} setColor={setCircleColor} />
-                                <ColorSlider color={ blue[500]} idf="blue"  check={circleColor_b} setColor={setCircleColor} />
-                            </Box>
-                        </Box>
-                    </Box>
-
-                    <Divider sx={{my:2}}/>
-                    
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            justifyContent: 'space-between'
-                        }}
-
-                        >
-                        <FormControlLabel control={<Checkbox checked={viewLine} onChange={(e) => setViewLine(e.target.checked)}/>} label="Line" />
-                        <FormControlLabel control={<Checkbox checked={viewMarker}  onChange={(e) => setViewMarker(e.target.checked)}/>} label="Marker" />
-                        <FormControlLabel control={<Checkbox checked={viewArrow} disabled  onChange={(e) => setViewArrow(e.target.checked)}/>} label="Arrow" />
-                    </Box>
-                </Box>
 
                 <LoadScript
                     googleMapsApiKey="AIzaSyBkZS2y5XLGTz09p372w0MV4bQgeukEiiQ"
@@ -489,25 +388,23 @@ export default function Googlepoly() {
                         center={center}
                         zoom={zoom}
                     >
-                        {
+                        {/* {
                             viewLine ? <Polyline path={path} options={lineOptions} />
                             : <></>
-                        }
-                        
-                        {/* {
-                            viewArrow ? <PolyArrow path={path} lineOptions={lineOptions} />
-                            : <></>
                         } */}
-
                         {
-                            viewMarker ? 
-                                path.map((c, idx) => (
-                                    <Circle center={c} key={idx} options={circleOptions} />
-                                ))
-                            : <></>
+                            idfs.map((idf) => (
+                                <>
+                                    <Polyline path={options[idf].path} options={options[idf].lineOption} />
+                                    
+                                    {
+                                        options[idf].path.map((c, idx) => (
+                                            <Circle center={c} key={idx} options={options[idf].circleOption} />
+                                        ))
+                                    }
+                                </>
+                            ))
                         }
-
-                        <Circle center={pointerMarker} options={pointerCircleOptions} />
 
                     </GoogleMap>
 

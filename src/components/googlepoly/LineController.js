@@ -1,15 +1,13 @@
-import { Box, Button, Checkbox, Divider, FormControlLabel, Slider, TextField, Typography } from "@mui/material";
+import { Box, Button, Checkbox, Divider, FormControlLabel, Slider, Table, TableBody, TableCell, TableRow, TextField, Typography } from "@mui/material";
 import {red, blue, green} from "@mui/material/colors"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ColorSlider from "./ColorSlider";
 
 export default function LineController(props) {
     let [circleColor, setCircleColor] = useState([255, 0, 0])
     let [lineColor, setLineColor] = useState([0, 0, 255]);
-    let [coordi, setCoordi] = useState('[[37.772, -122.214],[21.291, -157.821],[18.142, 178.431],[27.467, 153.027]]');
 
-    function makeLine() { }
-    function delLine() { props.delLine(props.idx) }
+    function delLine() { props.delLine(props.idf) }
 
     function setHhmmddd(val) { props.option.configCompOptions(props.idx, 'hhmmddd', val) }
     function setLngfirst() {
@@ -54,6 +52,10 @@ export default function LineController(props) {
         // props.setCircleColor(props.idx, tmpColor)
     }
 
+    useEffect(() => {
+        console.log(props.option)
+    }, [])
+
     return (
         <Box 
             sx={{
@@ -72,30 +74,26 @@ export default function LineController(props) {
                     mx : 0
                 }}
             >
-                <TextField
-                    variant="outlined"
-                    id="inputcoordi"
-                    value={coordi}
-                    multiline rows={4} label="Input Coordinates"
-                    sx={{width : 240, height : 120}}
-                    onChange={(e) => setCoordi(e.target.value)}
-                    
-                >
-
-                </TextField>
+                <Table sx={{ minWidth: 50 }} aria-label="simple table">
+                    <TableBody>
+                    {props.option.path.map((row, idx) => (
+                        <TableRow hover key={idx} sx={{'&:last-child td, &:last-child th': { border: 0 } }}>
+                            <TableCell sx={{py : 1}} component="th" scope="row">{idx}</TableCell>
+                            <TableCell sx={{p : 0}} align="right">{row.lat}</TableCell>
+                            <TableCell sx={{p : 0}} align="right">{row.lng}</TableCell>
+                        </TableRow>
+                    ))}
+                    </TableBody>
+                </Table>
 
                 <Box sx={{display : 'flex', alignItems : 'center'}}>
                     <FormControlLabel control={<Checkbox checked={props.option.hhmmddd} onChange={(e) => setHhmmddd(e.target.checked)}/>} label="hhmm˚ddd" />
                     <FormControlLabel control={<Checkbox checked={props.option.lngfirst} onChange={(e) => setLngfirst(e.target.checked)}/>} label="lng_first" />
                 </Box>
-                <Button
-                    sx={{m : 0, wdith : '100%'}} variant="outlined" size='small'
-                    onClick={(e) => makeLine()}
-                >
-                    Draw path
-                </Button>
             </Box>
             
+            <Divider  sx={{px : 1 }} orientation='vertical' />
+
             <Box
                 sx={{
                     width : 240 , px : 1,
