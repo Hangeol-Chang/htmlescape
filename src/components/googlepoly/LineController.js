@@ -4,62 +4,70 @@ import { useEffect, useState } from "react";
 import ColorSlider from "./ColorSlider";
 
 export default function LineController(props) {
-    let [circleColor, setCircleColor] = useState([255, 0, 0])
-    let [lineColor, setLineColor] = useState([0, 0, 255]);
-    let [option, setOption] = useState({})
+    let [circleColor_r, setCircleColor_r] = useState(255);
+    let [circleColor_g, setCircleColor_g] = useState(0);
+    let [circleColor_b, setCircleColor_b] = useState(0);
+
+    let [lineColor_r, setLineColor_r] = useState(0);
+    let [lineColor_g, setLineColor_g] = useState(0);
+    let [lineColor_b, setLineColor_b] = useState(255);
+
+    let [radius, setRadius] = useState(1);
+    let [option, setOption] = useState(props.option);
+    let [circleOption, setCircleOption] = useState(props.option.circleOption);
+    let [lineOption, setLineOption] = useState(props.option.lineOption);
+    let [viewLine, setViewLine] = useState(true);
+    let [viewMarker, setViewMarker] = useState(true);
 
     function delLine() { props.delLine(props.idf) }
 
-    function setHhmmddd(val) { props.option.configCompOptions(props.idx, 'hhmmddd', val) }
-    function setLngfirst() {
-
-    }
-    function setCircleRadius(val) {
-        // 부모 함수 호출
-    }
-    function setViewLine(val) {
-
-    }
-    function setViewMarker(val) {
-
-    }
-    function setViewArrow(val) {
-
+    function configCircleRadius(val) {
+        setCircleOption({...circleOption, radius : val})
     }
 
     const changeCircleColor = function(val, idf) {
-        if(idf == "red")        setCircleColor([val, circleColor[1], circleColor[2]]);
-        else if(idf == "green") setCircleColor([circleColor[0], val, circleColor[2]]);
-        else                    setCircleColor([circleColor[0], circleColor[1], val]);
+        if(idf == "red")        setCircleColor_r(val);
+        else if(idf == "green") setCircleColor_g(val);
+        else                    setCircleColor_b(val);
 
         const tmpColor = "#" + 
-            ("0" + circleColor[0].toString(16)).substr(-2) + 
-            ("0" + circleColor[1].toString(16)).substr(-2) +  
-            ("0" + circleColor[2].toString(16)).substr(-2);  
+            ("0" + circleColor_r.toString(16)).substr(-2) + 
+            ("0" + circleColor_g.toString(16)).substr(-2) +  
+            ("0" + circleColor_b.toString(16)).substr(-2);  
     
-        // props.setCircleColor(props.idx, tmpColor)
+        setCircleOption({...option, fillColor : tmpColor})
     }
 
     const changeLineColor = function(val, idf) {
-        if(idf == "red")        setLineColor([val, lineColor[1], lineColor[2]]);
-        else if(idf == "green") setLineColor([lineColor[0], val, lineColor[2]]);
-        else                    setLineColor([lineColor[0], lineColor[1], val]);
+        if(idf == "red")        setLineColor_r(val);
+        else if(idf == "green") setLineColor_g(val);
+        else                    setLineColor_b(val);
 
         const tmpColor = "#" + 
-            ("0" + lineColor[0].toString(16)).substr(-2) + 
-            ("0" + lineColor[1].toString(16)).substr(-2) +  
-            ("0" + lineColor[2].toString(16)).substr(-2);  
-    
-        setOption({...option, fillColor : tmpColor})
+            ("0" + lineColor_r.toString(16)).substr(-2) + 
+            ("0" + lineColor_g.toString(16)).substr(-2) +  
+            ("0" + lineColor_b.toString(16)).substr(-2);  
+        
+        setLineOption({...option, strokeColor : tmpColor});
     }
 
+    const changeViewLine = function(check) {
+        setViewLine(check);
+        setLineOption({...lineOption, visible : check});
+    }
+
+    const changeViewMarker = function(check) {
+        setViewMarker(check);
+        setCircleOption({...circleOption, visible : check});
+    }
+
+    // 옵션 동기처리
     useEffect(() => {
-        setOption(props.option)
-    }, [])
+        setOption({...option, lineOption, circleOption})
+    }, [lineOption, circleOption])
 
     useEffect(() => {
-        if(option.path)
-            props.configCompOption(props.idf, option)
+        props.configCompOption(props.idf, option)
     }, [option])
 
     return (
@@ -114,7 +122,8 @@ export default function LineController(props) {
                         sx={{mx : 1}} defaultValue={1}
                         step={0.002} min={0} max={2}
                         valueLabelDisplay="auto"
-                        onChange={(e) => setCircleRadius(e.target.value)}
+                        onChange={(e) => setRadius(e.target.value)}
+                        onChangeCommitted={() => configCircleRadius(radius)}
                     />
                 </Box>
                 <Divider/>
@@ -122,9 +131,9 @@ export default function LineController(props) {
                 <Box sx={{ display: 'flex', alignItems: 'center' }} >
                     <Typography sx={{width:80}} variant="body2">C Color</Typography>
                     <Box sx={{ display:'flex', width:'100%', }} >
-                        <ColorSlider color={ red[500] } idf="red"   check={circleColor[0]} setColor={changeCircleColor} />
-                        <ColorSlider color={green[500]} idf="green" check={circleColor[1]} setColor={changeCircleColor} />
-                        <ColorSlider color={ blue[500]} idf="blue"  check={circleColor[2]} setColor={changeCircleColor} />
+                        <ColorSlider color={ red[500] } idf="red"   check={circleColor_r} setColor={changeCircleColor} />
+                        <ColorSlider color={green[500]} idf="green" check={circleColor_g} setColor={changeCircleColor} />
+                        <ColorSlider color={ blue[500]} idf="blue"  check={circleColor_b} setColor={changeCircleColor} />
                     </Box>
                 </Box>
                 <Divider/>
@@ -138,9 +147,9 @@ export default function LineController(props) {
                         L Color
                     </Typography>
                     <Box sx={{ display:'flex', width:'100%',}}>
-                        <ColorSlider color={ red[500] } idf="red"   check={lineColor[0]} setColor={changeLineColor} />
-                        <ColorSlider color={green[500]} idf="green" check={lineColor[1]} setColor={changeLineColor} />
-                        <ColorSlider color={ blue[500]} idf="blue"  check={lineColor[2]} setColor={changeLineColor} />
+                        <ColorSlider color={ red[500] } idf="red"   check={lineColor_r} setColor={changeLineColor} />
+                        <ColorSlider color={green[500]} idf="green" check={lineColor_g} setColor={changeLineColor} />
+                        <ColorSlider color={ blue[500]} idf="blue"  check={lineColor_b} setColor={changeLineColor} />
                     </Box>
                 </Box>
 
@@ -148,9 +157,9 @@ export default function LineController(props) {
                 
                 <Box sx={{ display: 'flex', justifyContent: 'space-between'}}>
 
-                    <FormControlLabel control={<Checkbox checked={option.viewLine} onChange={(e) => setViewLine(e.target.checked)}/>} label="Line" />
-                    <FormControlLabel control={<Checkbox checked={option.viewMarker}  onChange={(e) => setViewMarker(e.target.checked)}/>} label="Marker" />
-                    <FormControlLabel control={<Checkbox checked={option.viewArrow} disabled  onChange={(e) => setViewArrow(e.target.checked)}/>} label="Arrow" />
+                    <FormControlLabel control={<Checkbox checked={viewLine} onChange={(e) => changeViewLine(e.target.checked)}/>} label="Line" />
+                    <FormControlLabel control={<Checkbox checked={viewMarker}  onChange={(e) => changeViewMarker(e.target.checked)}/>} label="Marker" />
+                    <FormControlLabel control={<Checkbox checked={option.viewArrow} disabled  onChange={() => {}}/>} label="Arrow" />
                 </Box>
                 <Button variant="outlined" color="error" size="small" onClick={() => delLine()}> Del Line</Button>
             </Box>

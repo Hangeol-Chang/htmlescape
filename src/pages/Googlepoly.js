@@ -21,8 +21,7 @@ export default function Googlepoly() {
         lineOption : {
             strokeOpacity: 0.8, strokeWeight: 2,
             clickable: false, draggable: false,
-            editable: false, visible: true,
-            radius: 30000, zIndex: 1,
+            editable: false, visible: true, zIndex: 1,
             strokeColor: "#0000FF"
         },
         circleOption : {
@@ -39,7 +38,10 @@ export default function Googlepoly() {
 
     function addOptions() { setOptions([...options, iniOption]); console.log(options) }
     
-    const configOption = function(idf, opt) { setOptions({...options, [idf] : opt}) }
+    const configOption = function(idf, opt) {
+        console.log(idf, opt)
+        setOptions({...options, [idf] : opt}) 
+    }
     
     function delOption(idf) {
         let tmpoptions = options
@@ -93,7 +95,6 @@ export default function Googlepoly() {
         let newLine = iniOption;
         newLine.path = convertrawCoorditoCoordi(rawCoordi);
 
-        let conut = idfCount
         setOptions({...options, [idfCount] : iniOption });
         setIdfs([...idfs, idfCount])
         setIdfCount(idfCount + 1);
@@ -119,10 +120,6 @@ export default function Googlepoly() {
     let [lineColor_r, setLineColor_r] = useState(0);
     let [lineColor_g, setLineColor_g] = useState(0);
     let [lineColor_b, setLineColor_b] = useState(255);
-
-    let [viewLine, setViewLine] = useState(true);
-    let [viewMarker, setViewMarker] = useState(true);
-    let [viewArrow, setViewArrow] = useState(true);
 
     let [lineOptions, setLineOptions] = useState({
         strokeOpacity: 0.8, strokeWeight: 2,
@@ -378,12 +375,22 @@ export default function Googlepoly() {
                         {
                             idfs.map((idf) => (
                                 <>
-                                    <Polyline path={options[idf].path} options={options[idf].lineOption} />
+                                    {
+                                        options[idf].viewLine ?
+                                            <Polyline path={options[idf].path} options={options[idf].lineOption} />
+                                        : <></>
+                                    }
                                     
                                     {
-                                        options[idf].path.map((c, idx) => (
-                                            <Circle center={c} key={idx} options={options[idf].circleOption} />
-                                        ))
+                                        options[idf].viewMarker ?
+                                            <>
+                                                {
+                                                    options[idf].path.map((c, idx) => (
+                                                        <Circle center={c} key={idx} options={options[idf].circleOption} />
+                                                    ))
+                                                }
+                                            </>
+                                        : <></>
                                     }
                                 </>
                             ))
