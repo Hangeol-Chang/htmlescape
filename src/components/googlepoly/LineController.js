@@ -15,15 +15,13 @@ export default function LineController(props) {
     let [radius, setRadius] = useState(1);
     let [option, setOption] = useState(props.option);
     let [circleOption, setCircleOption] = useState(props.option.circleOption);
-    let [lineOption, setLineOption] = useState(props.option.lineOption);
-    let [viewLine, setViewLine] = useState(true);
-    let [viewMarker, setViewMarker] = useState(true);
+    let [lineOption, setLineOption]     = useState(props.option.lineOption);
+    let [viewLine, setViewLine]         = useState(true);
+    let [viewMarker, setViewMarker]     = useState(true);
 
     function delLine() { props.delLine(props.idf) }
 
-    function configCircleRadius(val) {
-        setCircleOption({...circleOption, radius : val})
-    }
+    function configCircleRadius(val) { setCircleOption({...circleOption, radius : val}) }
 
     const changeCircleColor = function(val, idf) {
         if(idf == "red")        setCircleColor_r(val);
