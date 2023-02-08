@@ -86,16 +86,25 @@ export default function LineController(props) {
                     mx : 0
                 }}
             >
-                <TableContainer sx={{minWidth : 200, maxHeight : 200}}>
+                <TableContainer sx={{minWidth : 200, maxHeight : 150}}>
                     <Table aria-label="simple table">
                         <TableBody>
                         {
                             props.option.path.map((row, idx) => (
-                                <TableRow hover key={idx} sx={{'&:last-child td, &:last-child th': { border: 0 } }}>
-                                    <TableCell sx={{p : 0, width : 20}} component="th" scope="row">{idx}</TableCell>
-                                    <TableCell sx={{my : 1, width : 70}} align="left">{row.lat}</TableCell>
-                                    <TableCell sx={{p : 0, width : 70}} align="left">{row.lng}</TableCell>
-                                </TableRow>
+                                <Box
+                                    onPointerEnter={ (e) => (props.setPointerMarker({lat : row.lat, lng : row.lng})) }
+                                >
+                                    <TableRow hover key={idx} sx={{p : 0.5, display : 'flex', justifyContent : 'space-around'}}>
+                                        <TableCell sx={{pr : 1, py : 0, width : 20}} component="th" scope="row">{idx}</TableCell>
+                                        <TableCell sx={{pr : 1, py : 0, minWidth : 70}} align="left">
+                                            {row.lat}
+                                        </TableCell>
+                                        <TableCell sx={{p : 0, minWidth : 70}} align="left">
+                                            {row.lng}
+                                        </TableCell>
+                                    </TableRow>
+
+                                </Box>
                             ))
                         }  
                         </TableBody>
