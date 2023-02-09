@@ -1,7 +1,7 @@
 import './App.css';
 import { HashRouter as Router, Route, Routes} from "react-router-dom";
 
-import {Box} from '@mui/material'
+import {Box} from '@mui/material/'
 
 import Header from './pages/common/Header';
 import Footer from './pages/common/Footer';
